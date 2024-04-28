@@ -47,16 +47,16 @@ You can answer all kinds of interesting, complex questions with this normalized 
 #### 1. Which Eurovision songs were written in an imaginary language?
 
 ```sql
-SELECT *
+SELECT year, country, broadcaster, artist, song, language
 FROM song_view
 WHERE language = 'Imaginary'
 ```
 
-| year | country | broadcaster | artist      | song      | language  | song_id | artist_id |
-|------|---------|-------------|-------------|-----------|-----------|---------|-----------|
-| 2003 | Belgium | RTBF        | Urban Trad  | Sanomi    | Imaginary | 832     | 1226      |
-| 2008 | Belgium | VRT         | Ishtar      | Julissi | Imaginary | 997     | 1059      |
-| ...  | ...     | ...         | ...         | ...       | ...       | ...     | ...       |
+| year | country | broadcaster | artist      | song      | language  |
+|------|---------|-------------|-------------|-----------|-----------|
+| 2003 | Belgium | RTBF        | Urban Trad  | Sanomi    | Imaginary |
+| 2008 | Belgium | VRT         | Ishtar      | Julissi | Imaginary |
+| ...  | ...     | ...         | ...         | ...       | ...       |
 
 #### 2. Which artists competed in the most contests?
 
