@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: eurovision
+    volumes:
+      - ./data:/data
+      - ./flyway/sql:/flyway/sql
+    ports:
+      - "5432:5432"
+
+  flyway:
+    image: flyway/flyway
+    command: -url=jdbc:postgresql://db:5432/eurovision -user=postgres -password=postgres -locations=filesystem:/flyway/sql migrate
+    volumes:
+      - ./flyway/sql:/flyway/sql
+    depends_on:
+      - db
+
+volumes:
+  data:
