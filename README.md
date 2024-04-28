@@ -40,7 +40,7 @@ This project sets up a PostgreSQL database with Flyway for schema migrations and
 
 You can answer all kinds of interesting, complex questions with this normalized data. Here are several examples to get you started!
 
-### Which Eurovision songs were written in an imaginary language?
+#### 1. Which Eurovision songs were written in an imaginary language?
 
 ```sql
 SELECT *
@@ -54,7 +54,7 @@ WHERE language = 'Imaginary'
 | 2008 | Belgium | VRT         | Ishtar      | Julissi | Imaginary | 997     | 1059      |
 | ...  | ...     | ...         | ...         | ...       | ...       | ...     | ...       |
 
-### Which artists competed in the most contests?
+#### 2. Which artists competed in the most contests?
 
 ```sql
 SELECT
@@ -77,7 +77,7 @@ ORDER BY COUNT(*) DESC;
 | 3          | Lys Assia            | 1956, 1957, 1958         | Switzerland            |
 | ...        | ...                  | ...                      | ...                    |
 
-### Which composers had the most songs in Eurovision?
+#### 3. Which composers had the most songs in Eurovision?
 
 ```sql
 SELECT
