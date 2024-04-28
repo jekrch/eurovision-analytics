@@ -4,6 +4,9 @@ CREATE TABLE country (
   code TEXT NOT NULL
 );
 
+CREATE UNIQUE INDEX IF NOT EXISTS country_name_uidx ON country(name);
+CREATE UNIQUE INDEX IF NOT EXISTS country_code_uidx ON country(code);
+
 INSERT INTO country (name, code) VALUES
   ('Albania', 'al'),
   ('Andorra', 'ad'),
@@ -56,4 +59,7 @@ INSERT INTO country (name, code) VALUES
   ('Turkey', 'tr'),
   ('Ukraine', 'ua'),
   ('United Kingdom', 'gb'),
-  ('Yugoslavia', 'yu');
+  ('Yugoslavia', 'yu'),
+  -- note that this is a psuedo country that is included as a voting source 
+  -- since the 2023 contest
+  ('Rest of World', 'row'); 

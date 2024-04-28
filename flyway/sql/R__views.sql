@@ -32,3 +32,24 @@ GROUP BY
   a.id, 
   s.id,
   cd.id;
+
+
+-- this aggregates voting data between countries for different years and rounds voting types 
+CREATE OR REPLACE VIEW vote_view AS
+SELECT
+  v.id AS vote_id,
+  v.year,
+  r.name AS round,
+  vt.name AS vote_type,
+  v.points,
+  vc.name AS voting_country,
+  c.name AS country,
+  vc.code AS voting_country_code,
+  c.code AS country_code, 
+  vc.id AS voting_country_id,
+  c.code AS country_id
+FROM vote v
+JOIN round r ON v.round_id = r.id
+JOIN vote_type vt ON v.vote_type_id = vt.id
+JOIN country vc ON v.voting_country_id = vc.id
+JOIN country c ON v.country_id = c.id;
