@@ -1,11 +1,6 @@
-# Eurovision Analytics
+# Eurovision Analytics :globe_with_meridians:
 
 This project sets up a PostgreSQL database with Flyway for schema migrations and imports data from CSV files into staging tables. The database is containerized using Docker Compose for easy setup and deployment.
-
-## Prerequisites
-
-- Docker
-- Docker Compose
 
 ## Getting Started
 
@@ -15,7 +10,7 @@ This project sets up a PostgreSQL database with Flyway for schema migrations and
     cd eurovision-database
     ```
 
-2. Place the following CSV files in the `data` directory:
+2. Place the following CSV files in the `data` directory (or use the provided default files):
     - `eurovision_vote_data.csv`
     - `eurovision_participant_data.csv`
 
@@ -27,7 +22,7 @@ This project sets up a PostgreSQL database with Flyway for schema migrations and
     docker-compose up -d
     ```
 
-    This command will start the PostgreSQL database and run the Flyway migration, creating the staging tables and importing the data from the CSV files.
+    This command will start the PostgreSQL database and run the Flyway migrations, creating the db schema and importing the data from the CSV files.
 
 4. Connect to the database:
 
@@ -38,6 +33,4 @@ This project sets up a PostgreSQL database with Flyway for schema migrations and
     - Database: `eurovision`
     - Username: `postgres`
     - Password: `postgres`
-
-    The staging tables will be available in the `eurovision` database, and you can query them to access the imported data.
 
