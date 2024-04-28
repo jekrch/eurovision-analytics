@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS song_conductor (
 -- indexes
 
 -- country table
-CREATE INDEX IF NOT EXISTS country_code_idx ON country (code);
+CREATE UNIQUE INDEX IF NOT EXISTS country_code_uidx ON country (code);
 
 -- artist table
 CREATE UNIQUE INDEX artist_name_uidx ON artist (name);

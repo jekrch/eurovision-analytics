@@ -30,12 +30,8 @@ SELECT DISTINCT ON (spd.song, spd.year)
   spd.year
 FROM staging_participant_data spd
 JOIN artist a ON spd.artist = a.name
-JOIN (
-  SELECT DISTINCT ON (name) code, id
-  FROM country
-  ORDER BY name, id DESC
-) c ON spd.country = c.code
-ORDER BY spd.song, spd.year, c.id DESC;
+JOIN country c ON spd.country = c.code
+ORDER BY spd.year, spd.song, c.id ASC;
 
 -- song-composer relationships
 INSERT INTO song_composer (song_id, composer_id)
