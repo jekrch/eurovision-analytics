@@ -20,7 +20,7 @@ ON CONFLICT (name) DO NOTHING;
 
 -- songs
 INSERT INTO song (name, language, broadcaster, wiki_url, artist_id, country_id, year)
-SELECT DISTINCT
+SELECT DISTINCT ON (spd.song, spd.year)
   spd.song,
   spd.language,
   spd.broadcaster,
@@ -30,7 +30,12 @@ SELECT DISTINCT
   spd.year
 FROM staging_participant_data spd
 JOIN artist a ON spd.artist = a.name
-JOIN country c ON spd.country = c.code;
+JOIN (
+  SELECT DISTINCT ON (name) code, id
+  FROM country
+  ORDER BY name, id DESC
+) c ON spd.country = c.code
+ORDER BY spd.song, spd.year, c.id DESC;
 
 -- song-composer relationships
 INSERT INTO song_composer (song_id, composer_id)
