@@ -10,8 +10,8 @@ The database is containerized using Docker Compose for easy setup and deployment
 
 1. Clone the repository:
     ```
-    git clone https://github.com/yourusername/eurovision-database.git
-    cd eurovision-database
+    git clone https://github.com/jekrch/eurovision-analytics.git
+    cd eurovision-analytics
     ```
 
 2. Place the following CSV files in the `data` directory (or use the provided default files):
