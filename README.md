@@ -104,3 +104,11 @@ ORDER BY COUNT(*) DESC;
 | 12         | Thomas G:son       | 2001, 2006, 2007, 2010, 2012, 2012, 2013, 2015, 2015, 2016, 2016, 2018    | Cyprus, Denmark, Georgia, Malta, Spain, Sweden    |
 | 9          | Dimitris Kontopoulos | 2009, 2013, 2014, 2016, 2017, 2018, 2019, 2021, 2021                     | Azerbaijan, Greece, Moldova, Russia               |
 | ...        | ...                | ...                                                                       | ...                                               |
+
+## Node4j graph data modeling
+
+http://localhost:7474/browser/
+user: `neo4j`
+password: `unitedbymusic`
+<img width="760" alt="image" src="https://github.com/jekrch/eurovision-analytics/assets/8173930/f24e0d32-2e6e-4d6f-8cfe-ba6ee11ac9ac">
+
