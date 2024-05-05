@@ -62,14 +62,24 @@ SELECT
   vv.country_id, 
   vv.country, 
   vv.round, 
+  sv.artist_id,
+  sv.artist, 
+  sv.song_id, 
+  sv.song
   SUM(points) AS total_points,
   RANK() OVER (
     PARTITION BY vv.year, vv.round
     ORDER BY SUM(points) DESC
   ) AS rank
 FROM vote_view vv
+JOIN song_view sv ON sv.country_id = vv.country_id AND 
+                     sv.year = vv.year
 GROUP BY 
   vv.year, 
   vv.country_id, 
   vv.country, 
-  vv.round;
+  vv.round,
+  sv.artist_id,
+  sv.artist, 
+  sv.song_id, 
+  sv.song;
