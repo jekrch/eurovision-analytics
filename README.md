@@ -112,7 +112,7 @@ In addition to PostgreSQL, this project also supports loading the Eurovision dat
 
 The Neo4j database is automatically set up and populated with data using Docker Compose. The provided `docker-compose.yml` file includes the necessary configuration to start a Neo4j container and execute the data migration scripts.
 
-<img width="760" alt="image" src="https://github.com/jekrch/eurovision-analytics/assets/8173930/f24e0d32-2e6e-4d6f-8cfe-ba6ee11ac9ac">
+<img width="958" alt="image" src="https://github.com/jekrch/eurovision-analytics/assets/8173930/aabb4661-6636-4ec7-86c0-7d2df993f7af">
 
 ### Access the Neo4j Browser:
 
