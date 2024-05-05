@@ -62,13 +62,13 @@ WHERE language = 'Imaginary'
 
 ```sql
 SELECT
-  count(*) AS song_count,
+  COUNT(*) AS song_count,
   artist,
   STRING_AGG(CAST(year AS TEXT), ', ' ORDER BY year ASC) as contest_years,
   STRING_AGG(DISTINCT country, ', ') as country
 FROM song_view
 GROUP BY artist
-HAVING count(*) > 1
+HAVING COUNT(*) > 1
 ORDER BY COUNT(*) DESC;
 ```
 
@@ -85,7 +85,7 @@ ORDER BY COUNT(*) DESC;
 
 ```sql
 SELECT
-  count(DISTINCT sv.song_id) AS song_count,
+  COUNT(DISTINCT sv.song_id) AS song_count,
   c.name,
   STRING_AGG(CAST(sv.year AS TEXT), ', ' ORDER BY year ASC) as contest_years,
   STRING_AGG(DISTINCT sv.country, ', ') as country
@@ -93,7 +93,7 @@ FROM song_view sv
 JOIN song_composer sc ON sc.song_id = sv.song_id
 JOIN composer c ON c.id = sc.composer_id
 GROUP BY c.name
-HAVING count(*) > 1
+HAVING COUNT(*) > 1
 ORDER BY COUNT(*) DESC;
 ```
 
@@ -105,13 +105,23 @@ ORDER BY COUNT(*) DESC;
 | 9          | Dimitris Kontopoulos | 2009, 2013, 2014, 2016, 2017, 2018, 2019, 2021, 2021                     | Azerbaijan, Greece, Moldova, Russia               |
 | ...        | ...                | ...                                                                       | ...                                               |
 
-## Node4j graph data modeling
+## Neo4j graph data modeling :bar_chart:
 
-http://localhost:7474/browser/
 
-user: `neo4j`
+In addition to PostgreSQL, this project also supports loading the Eurovision data into Neo4j which allows you to explore and analyze the data using graph-based queries and visualizations.
 
-password: `unitedbymusic`
+The Neo4j database is automatically set up and populated with data using Docker Compose. The provided `docker-compose.yml` file includes the necessary configuration to start a Neo4j container and execute the data migration scripts.
 
 <img width="760" alt="image" src="https://github.com/jekrch/eurovision-analytics/assets/8173930/f24e0d32-2e6e-4d6f-8cfe-ba6ee11ac9ac">
 
+### Access the Neo4j Browser:
+
+  1. Open a web browser and visit `http://localhost:7474`.
+  2. Log in using the default credentials 
+    
+      * username: `neo4j`
+      * password: `unitedbymusic`
+
+### Graph-Based Analytics
+
+With the Eurovision data loaded into Neo4j, you can perform various graph-based analyses and visualizations. Here are a few examples:
