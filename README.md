@@ -136,3 +136,13 @@ LIMIT 10
 ```
 
 <img width="952" alt="image" src="https://github.com/jekrch/eurovision-analytics/assets/8173930/c5591eb7-3009-46e7-b2fa-d5a70c01c2fa">
+
+
+### The top five winningest countries
+```sql
+MATCH (c:Country)<-[:REPRESENTS]-(s:Song)-[:RANKED]->(:FinalRank {rank: 1})
+MATCH (s)-[:HAS_SONG]-(y:Year)
+WITH c, collect({song: s, year: y}) AS songs, count(s) AS count
+ORDER BY count DESC
+LIMIT 5
+RETURN c, songs
