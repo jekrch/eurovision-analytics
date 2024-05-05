@@ -108,7 +108,10 @@ ORDER BY COUNT(*) DESC;
 ## Node4j graph data modeling
 
 http://localhost:7474/browser/
+
 user: `neo4j`
+
 password: `unitedbymusic`
+
 <img width="760" alt="image" src="https://github.com/jekrch/eurovision-analytics/assets/8173930/f24e0d32-2e6e-4d6f-8cfe-ba6ee11ac9ac">
 
