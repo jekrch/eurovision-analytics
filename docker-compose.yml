@@ -20,6 +20,19 @@ services:
       - ./flyway/sql:/flyway/sql
     depends_on:
       - db
+    restart: on-failure
 
+  neo4j:
+    container_name: neo4j
+    build:
+      context: ./neo4j/
+      dockerfile: Dockerfile
+    ports:
+      - 7474:7474
+      - 7687:7687
+    depends_on:
+      - db
+    restart: on-failure
+    
 volumes:
   data:
