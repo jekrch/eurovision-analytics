@@ -125,3 +125,12 @@ The Neo4j database is automatically set up and populated with data using Docker 
 ### Graph-Based Analytics
 
 With the Eurovision data loaded into Neo4j, you can perform various graph-based analyses and visualizations. Here are a few examples:
+
+### The top ten most prolific Eurovision songwriters
+```sql
+MATCH (sw:Songwriter)<-[:WRITTEN_BY]-(s:Song)
+WITH sw, collect(s) as songs
+ORDER BY size(songs) DESC
+RETURN sw, songs
+LIMIT 10
+```

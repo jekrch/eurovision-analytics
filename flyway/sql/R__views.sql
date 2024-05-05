@@ -53,3 +53,23 @@ JOIN round r ON v.round_id = r.id
 JOIN vote_type vt ON v.vote_type_id = vt.id
 JOIN country vc ON v.voting_country_id = vc.id
 JOIN country c ON v.country_id = c.id;
+
+
+-- this represents the rank and total points of each country for each contest round per year
+CREATE OR REPLACE VIEW vote_rank_view AS 
+SELECT
+  vv.year, 
+  vv.country_id, 
+  vv.country, 
+  vv.round, 
+  SUM(points) AS total_points,
+  RANK() OVER (
+    PARTITION BY vv.year, vv.round
+    ORDER BY SUM(points) DESC
+  ) AS rank
+FROM vote_view vv
+GROUP BY 
+  vv.year, 
+  vv.country_id, 
+  vv.country, 
+  vv.round;
