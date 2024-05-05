@@ -134,3 +134,5 @@ ORDER BY size(songs) DESC
 RETURN sw, songs
 LIMIT 10
 ```
+
+<img width="952" alt="image" src="https://github.com/jekrch/eurovision-analytics/assets/8173930/c5591eb7-3009-46e7-b2fa-d5a70c01c2fa">
