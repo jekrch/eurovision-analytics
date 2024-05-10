@@ -31,7 +31,6 @@ services:
       - 7687:7687
     depends_on:
       - db
-    restart: on-failure
     
 volumes:
   data:
