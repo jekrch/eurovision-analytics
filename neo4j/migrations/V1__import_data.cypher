@@ -20,8 +20,8 @@ FOREACH (conductor IN CASE WHEN row.conductor IS NOT NULL THEN [row.conductor] E
 CALL apoc.load.jdbc('jdbc:postgresql://db:5432/eurovision?user=postgres&password=postgres', "SELECT * FROM vote_rank_view WHERE round = 'Final'") YIELD row
 MATCH (s:Song {id: row.song_id})
 WITH s, row
-WHERE row.rank IS NOT NULL
+WHERE row.final_place IS NOT NULL
 SET s.totalPoints = row.total_points
-MERGE (r:FinalRank {rank: row.rank})
-SET r.name = toString(row.rank)
-MERGE (s)-[:RANKED]->(r);
+MERGE (r:FinalPlace {place: row.final_place})
+SET r.name = toString(row.final_place)
+MERGE (s)-[:PLACED]->(r);

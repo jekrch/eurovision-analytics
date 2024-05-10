@@ -140,9 +140,10 @@ LIMIT 10
 
 ### The top five winningest countries
 ```sql
-MATCH (c:Country)<-[:REPRESENTS]-(s:Song)-[:RANKED]->(:FinalRank {rank: 1})
+MATCH (c:Country)<-[:REPRESENTS]-(s:Song)-[:PLACED]->(:FinalPlace {place: 1})
 MATCH (s)-[:HAS_SONG]-(y:Year)
 WITH c, collect({song: s, year: y}) AS songs, count(s) AS count
 ORDER BY count DESC
 LIMIT 5
 RETURN c, songs
+```
