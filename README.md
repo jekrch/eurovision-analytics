@@ -147,3 +147,4 @@ ORDER BY count DESC
 LIMIT 5
 RETURN c, songs
 ```
+<img width="952" alt="image" src="https://github.com/jekrch/eurovision-analytics/assets/8173930/a83a546f-4827-475a-a6da-a66df131051f">
