@@ -20,7 +20,6 @@ services:
       - ./flyway/sql:/flyway/sql
     depends_on:
       - db
-    restart: on-failure
 
   neo4j:
     container_name: neo4j

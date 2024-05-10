@@ -20,6 +20,14 @@ CREATE TABLE staging_participant_data (
   conductors TEXT
 );
 
--- copy csv data directly to staging tables
+CREATE TABLE staging_result_data (
+  year INTEGER,
+  country TEXT,
+  running_order INTEGER,
+  place TEXT
+);
+
+-- copy csv data directly to staging tables 
 COPY staging_vote_data FROM '/data/eurovision_vote_data.csv' DELIMITER ',' CSV HEADER;
 COPY staging_participant_data FROM '/data/eurovision_participant_data.csv' DELIMITER ',' CSV HEADER;
+COPY staging_result_data FROM '/data/eurovision_result_data.csv' DELIMITER ',' CSV HEADER;

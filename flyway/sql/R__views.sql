@@ -11,7 +11,8 @@ SELECT
   cd.name AS conductor,
   a.id AS artist_id, 
   s.id AS song_id,
-  cd.id AS conductor_id
+  cd.id AS conductor_id,
+  c.id AS country_id
 FROM song s
 JOIN artist a ON s.artist_id = a.id
 JOIN country c ON s.country_id = c.id
@@ -31,7 +32,8 @@ GROUP BY
   cd.name,
   a.id, 
   s.id,
-  cd.id;
+  cd.id,
+  c.id;
 
 
 -- this aggregates voting data between countries for different years and rounds voting types 
@@ -47,7 +49,7 @@ SELECT
   vc.code AS voting_country_code,
   c.code AS country_code, 
   vc.id AS voting_country_id,
-  c.code AS country_id
+  c.id AS country_id
 FROM vote v
 JOIN round r ON v.round_id = r.id
 JOIN vote_type vt ON v.vote_type_id = vt.id
@@ -65,7 +67,7 @@ SELECT
   sv.artist_id,
   sv.artist, 
   sv.song_id, 
-  sv.song
+  sv.song,
   SUM(points) AS total_points,
   RANK() OVER (
     PARTITION BY vv.year, vv.round
