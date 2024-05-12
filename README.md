@@ -154,8 +154,10 @@ RETURN c, songs
 MATCH (c:Country)-[:REPRESENTS]-(s:Song)-[:RECEIVED]->(n:nilPoi), (s)-[:HAS_SONG]-(y:Year)
 WITH c, s, y
 ORDER BY c.name, y.year
+WHERE y.year <> 1956 // points were not awared in 1956
 WITH c, COLLECT(s) AS songs, COLLECT(y) AS years
 WHERE SIZE(songs) > 1
 RETURN c, songs, years
 ```
-<img width="955" alt="image" src="https://github.com/jekrch/eurovision-analytics/assets/8173930/0608c143-8b8b-49ae-bf28-beef2468ce4a">
+<img width="959" alt="image" src="https://github.com/jekrch/eurovision-analytics/assets/8173930/91d934fd-2539-430b-bfdc-4846c67f5004">
+
