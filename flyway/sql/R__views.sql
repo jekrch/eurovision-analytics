@@ -60,29 +60,29 @@ JOIN country c ON v.country_id = c.id;
 -- this represents the rank and total points of each country for each contest round per year
 
  -- this represents the rank and total points of each country for each contest round per year
+
 CREATE OR REPLACE VIEW vote_rank_view AS 
 SELECT
-  vv.year, 
-  vv.country_id, 
-  vv.country, 
-  vv.round, 
+  fr.year, 
+  fr.country_id, 
+  sv.country, 
+  'Final' AS round, 
   sv.artist_id,
   sv.artist, 
   sv.song_id, 
   sv.song,
-  SUM(points) AS total_points,
+  coalesce(SUM(vv.points), 0) AS total_points,
   fr.place AS final_place,
   fr.running_order AS final_running_order
-FROM vote_view vv
-JOIN song_view sv ON sv.country_id = vv.country_id AND 
-                     sv.year = vv.year
-LEFT JOIN finals_result fr ON fr.song_id = sv.song_id AND 
-							                vv.round = 'Final'
+FROM song_view sv
+LEFT JOIN vote_view vv ON sv.country_id = vv.country_id AND 
+                     	    sv.year = vv.year AND 
+						              vv.round = 'Final'
+JOIN finals_result fr ON fr.song_id = sv.song_id 
 GROUP BY 
-  vv.year, 
-  vv.country_id, 
-  vv.country, 
-  vv.round,
+  fr.year, 
+  fr.country_id, 
+  sv.country, 
   sv.artist_id,
   sv.artist, 
   sv.song_id, 
