@@ -158,3 +158,4 @@ WITH c, COLLECT(s) AS songs, COLLECT(y) AS years
 WHERE SIZE(songs) > 1
 RETURN c, songs, years
 ```
+<img width="955" alt="image" src="https://github.com/jekrch/eurovision-analytics/assets/8173930/0608c143-8b8b-49ae-bf28-beef2468ce4a">
