@@ -174,3 +174,4 @@ UNWIND artists as a
 UNWIND years as y
 RETURN ro, s, a, y
 ```
+<img width="956" alt="image" src="https://github.com/jekrch/eurovision-analytics/assets/8173930/506c19f2-9f84-4663-b2b4-7e7191643cc8">
