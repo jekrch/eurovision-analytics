@@ -148,3 +148,13 @@ LIMIT 5
 RETURN c, songs
 ```
 <img width="952" alt="image" src="https://github.com/jekrch/eurovision-analytics/assets/8173930/a83a546f-4827-475a-a6da-a66df131051f">
+
+### Countries with more than one song receiving Nil Poi in the finals
+```sql
+MATCH (c:Country)-[:REPRESENTS]-(s:Song)-[:RECEIVED]->(n:nilPoi), (s)-[:HAS_SONG]-(y:Year)
+WITH c, s, y
+ORDER BY c.name, y.year
+WITH c, COLLECT(s) AS songs, COLLECT(y) AS years
+WHERE SIZE(songs) > 1
+RETURN c, songs, years
+```
