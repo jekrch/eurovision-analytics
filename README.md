@@ -161,3 +161,16 @@ RETURN c, songs, years
 ```
 <img width="959" alt="image" src="https://github.com/jekrch/eurovision-analytics/assets/8173930/91d934fd-2539-430b-bfdc-4846c67f5004">
 
+### The top 3 running orders with the most songs winning the finals
+```sql
+MATCH (ro:FinalRunningOrder)<-[:RUNNING_ORDER]-(s:Song)-[:PLACED]->(fp:FinalPlace {place: 1})
+MATCH (s)-[:PERFORMED_BY]->(a:Artist)
+MATCH (s)-[:HAS_SONG]-(y:Year)
+WITH ro, collect(s) as songs, collect(a) as artists, collect(y) as years
+ORDER BY size(songs) DESC
+LIMIT 3
+UNWIND songs as s
+UNWIND artists as a
+UNWIND years as y
+RETURN ro, s, a, y
+```
