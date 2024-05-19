@@ -173,3 +173,36 @@ UNWIND years as y
 RETURN ro, s, a, y
 ```
 <img width="956" alt="image" src="https://github.com/jekrch/eurovision-analytics/assets/8173930/506c19f2-9f84-4663-b2b4-7e7191643cc8">
+
+
+## GraphQL API :rocket:
+
+This project also exposes the Neo4j Eurovision data through a GraphQL API, allowing you to query and retrieve data using GraphQL queries.
+
+### Accessing the GraphQL API
+
+1. The GraphQL API is automatically set up and made available using Docker Compose. `docker-compose up -d`.
+2. Use the API at `http://localhost:4000` 
+
+### Example GraphQL Query
+
+Here's an example GraphQL query that retrieves all songs from Croatia that have a final place:
+
+```graphql
+query {
+  songs(where: { country: { name: "Croatia" }, finalPlace: { place_NOT: null } }) {
+    id
+    name
+    year {
+      year
+    }
+    artist {
+      name
+    }
+    finalPlace {
+      place
+    }
+    totalPoints
+  }
+}
+```

@@ -1,0 +1,84 @@
+type Year {
+    year: Int!
+    songs: [Song!]! @relationship(type: "HAS_SONG", direction: OUT)
+}
+
+type Country {
+    name: String!
+    songs: [Song!]! @relationship(type: "REPRESENTS", direction: IN)
+}
+
+type Broadcaster {
+    name: String!
+    songs: [Song!]! @relationship(type: "BROADCAST_BY", direction: IN)
+}
+
+type Artist {
+    id: ID!
+    name: String!
+    songs: [Song!]! @relationship(type: "PERFORMED_BY", direction: IN)
+}
+
+type Song {
+    id: ID!
+    name: String!
+    year: Year! @relationship(type: "HAS_SONG", direction: IN)
+    artist: Artist! @relationship(type: "PERFORMED_BY", direction: OUT)
+    country: Country! @relationship(type: "REPRESENTS", direction: OUT)
+    broadcaster: Broadcaster! @relationship(type: "BROADCAST_BY", direction: OUT)
+    languages: [Language!]! @relationship(type: "IN_LANGUAGE", direction: OUT)
+    songwriters: [Songwriter!]! @relationship(type: "WRITTEN_BY", direction: OUT)
+    conductor: Conductor @relationship(type: "CONDUCTED_BY", direction: OUT)
+    totalPoints: Int
+    finalPlace: FinalPlace @relationship(type: "PLACED", direction: OUT)
+    finalRunningOrder: Int
+    runningOrder: FinalRunningOrder @relationship(type: "RUNNING_ORDER", direction: OUT)
+    zeroPoints: ZeroPoints @relationship(type: "RECEIVED", direction: OUT)
+}
+
+type Language {
+    name: String!
+    songs: [Song!]! @relationship(type: "IN_LANGUAGE", direction: IN)
+}
+
+type Songwriter {
+    name: String!
+    songs: [Song!]! @relationship(type: "WRITTEN_BY", direction: IN)
+}
+
+type Conductor {
+    id: ID!
+    name: String!
+    songs: [Song!]! @relationship(type: "CONDUCTED_BY", direction: IN)
+}
+
+type FinalPlace {
+    place: Int!
+    name: String!
+    songs: [Song!]! @relationship(type: "PLACED", direction: IN)
+}
+
+type FinalRunningOrder {
+    order: Int!
+    name: String!
+    songs: [Song!]! @relationship(type: "RUNNING_ORDER", direction: IN)
+}
+
+type ZeroPoints {
+    name: String!
+    songs: [Song!]! @relationship(type: "RECEIVED", direction: IN)
+}
+
+type Query {
+    years: [Year!]!
+    countries: [Country!]!
+    broadcasters: [Broadcaster!]!
+    artists: [Artist!]!
+    songs: [Song!]!
+    languages: [Language!]!
+    songwriters: [Songwriter!]!
+    conductors: [Conductor!]!
+    finalPlaces: [FinalPlace!]!
+    finalRunningOrders: [FinalRunningOrder!]!
+    zeroPointsSongs: [Song!]!
+}
