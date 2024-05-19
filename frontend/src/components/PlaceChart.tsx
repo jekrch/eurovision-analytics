@@ -60,23 +60,23 @@ const PlaceChart: React.FC = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     query: `
-            query {
-              songs(where: { country: { name: "${selectedCountry}" }, finalPlace: { place_NOT: null } }) {
-                id
-                name
-                year { year }
-                artist { name }
-                finalPlace { place }
-                totalPoints
-              }
-            }
-          `,
+                        query {
+                            songs(where: { country: { name: "${selectedCountry}" }, finalPlace: { place_NOT: null } }) {
+                                id
+                                name
+                                year { year }
+                                artist { name }
+                                finalPlace { place }
+                                totalPoints
+                            }
+                        }
+                    `,
                 }),
             });
             const data = await response.json();
-            const sortedData = data.data.songs.sort((a: Song, b: Song) => a.year.year - b.year.year);
-            setSongs(sortedData);
-            setSortedSongs(sortedData);
+            const sortedSongs = data.data.songs.sort((a: Song, b: Song) => b.year.year - a.year.year);
+            setSongs(sortedSongs);
+            setSortedSongs(sortedSongs);
         };
 
         if (selectedCountry) {
@@ -135,6 +135,7 @@ const PlaceChart: React.FC = () => {
     };
 
     const options = {
+        maintainAspectRatio: false,
         scales: {
             y: {
                 reverse: true,
@@ -174,8 +175,8 @@ const PlaceChart: React.FC = () => {
                 />
             </div>
 
-            <div className="mb-8 max-h-[80%]">
-                <Line data={chartData} options={options as any} />
+            <div className="mb-8">
+                <Line className="min-h-350 h-[15em]" data={chartData} options={options as any} />
             </div>
 
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
