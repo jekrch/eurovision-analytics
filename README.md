@@ -117,10 +117,8 @@ The Neo4j database is automatically set up and populated with data using Docker 
 ### Access the Neo4j Browser:
 
   1. Open a web browser and visit `http://localhost:7474`.
-  2. Log in using the default credentials 
-    
-      * username: `neo4j`
-      * password: `unitedbymusic`
+  2. Click `Connect`. No credentials required
+
 
 ### Graph-Based Analytics
 
