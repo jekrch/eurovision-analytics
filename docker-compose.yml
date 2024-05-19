@@ -47,5 +47,18 @@ services:
       - NEO4J_USER=neo4j
       - NEO4J_PASSWORD=password
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - 3000:3000
+    depends_on:
+      - graphql-api
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      
 volumes:
   data:
