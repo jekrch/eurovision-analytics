@@ -206,3 +206,4 @@ query {
   }
 }
 ```
+<img width="955" alt="image" src="https://github.com/jekrch/eurovision-analytics/assets/8173930/2515b2c8-2171-46a8-87e0-70aead68eb7c">
