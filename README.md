@@ -149,7 +149,7 @@ RETURN c, songs
 
 ### Countries with more than one song receiving Nil Poi in the finals
 ```sql
-MATCH (c:Country)-[:REPRESENTS]-(s:Song)-[:RECEIVED]->(n:nilPoi), (s)-[:HAS_SONG]-(y:Year)
+MATCH (c:Country)-[:REPRESENTS]-(s:Song)-[:RECEIVED]->(n:ZeroPoints), (s)-[:HAS_SONG]-(y:Year)
 WITH c, s, y
 ORDER BY c.name, y.year
 WHERE y.year <> 1956 // points were not awared in 1956
