@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
-import { Chart, registerables } from 'chart.js';
+import { Chart, PointElement, registerables } from 'chart.js';
 import CountryDropdown from './CountryDropdown';
 import SongTable from './SongTable';
 
@@ -37,12 +37,12 @@ const PlaceChart: React.FC = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     query: `
-          query {
-            countries(options: { sort: [{ name: ASC }] }) {
-              name
-            }
-          }
-          `,
+                        query {
+                            countries(options: { sort: [{ name: ASC }] }) {
+                            name
+                            }
+                        }
+                    `,
                 }),
             });
             const data = await response.json();
@@ -74,7 +74,7 @@ const PlaceChart: React.FC = () => {
                 }),
             });
             const data = await response.json();
-            const sortedSongs = data.data.songs.sort((a: Song, b: Song) => b.year.year - a.year.year);
+            const sortedSongs = data.data.songs.sort((a: Song, b: Song) => a.year.year - b.year.year);
             setSongs(sortedSongs);
             setSortedSongs(sortedSongs);
         };
@@ -124,17 +124,27 @@ const PlaceChart: React.FC = () => {
     const chartData = {
         labels: songs.map((song) => song.year.year),
         datasets: [
-            {
-                label: 'Final Place',
-                data: songs.map((song) => song.finalPlace.place),
-                fill: false,
-                borderColor: 'rgb(118 163 184)',
-                tension: 0.1,
-            },
+          {
+            label: 'Final Place',
+            data: songs.map((song) => song.finalPlace.place),
+            fill: true,
+            borderColor: 'rgb(118 163 184)',
+            tension: 0.03,
+            pointRadius: songs.map((song) => {
+              const place = song.finalPlace.place;
+              // Adjust the size based on the place
+              return 10 - place + 2; 
+            }),
+            pointHoverRadius: songs.map((song) => {
+              const place = song.finalPlace.place;
+              // Adjust the size on hover based on the place
+              return 12 - place + 2; 
+            }),
+          },
         ],
-    };
+      };
 
-    const options = {
+    const chartOptions = {
         maintainAspectRatio: false,
         scales: {
             y: {
@@ -148,19 +158,6 @@ const PlaceChart: React.FC = () => {
             },
         },
     };
-
-
-    const [isOpen, setIsOpen] = useState(false);
-
-    const handleCountryChange = (countryName: string) => {
-        setSelectedCountry(countryName);
-        setIsOpen(false);
-    };
-
-    const toggleDropdown = () => {
-        setIsOpen(!isOpen);
-    };
-
 
     return (
         <div className="container pb-20 mb-0">
@@ -176,7 +173,7 @@ const PlaceChart: React.FC = () => {
             </div>
 
             <div className="mb-8">
-                <Line className="min-h-350 h-[15em]" data={chartData} options={options as any} />
+                <Line className="min-h-350 h-[15em]" data={chartData} options={chartOptions as any} />
             </div>
 
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
