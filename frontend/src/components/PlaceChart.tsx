@@ -3,6 +3,7 @@ import { Line } from 'react-chartjs-2';
 import { Chart, PointElement, registerables } from 'chart.js';
 import CountryDropdown from './CountryDropdown';
 import SongTable from './SongTable';
+import LineChart from './Chart';
 
 Chart.register(...registerables);
 
@@ -24,11 +25,6 @@ const PlaceChart: React.FC = () => {
     const [countries, setCountries] = useState<Country[]>([]);
     const [selectedCountry, setSelectedCountry] = useState<string>('Croatia');
     const [songs, setSongs] = useState<Song[]>([]);
-    const [sortedSongs, setSortedSongs] = useState<Song[]>([]);
-    const [sortConfig, setSortConfig] = useState<{ key: keyof Song; direction: 'asc' | 'desc' }>({
-        key: 'year',
-        direction: 'asc',
-    });
 
     useEffect(() => {
         const fetchCountries = async () => {
@@ -76,50 +72,12 @@ const PlaceChart: React.FC = () => {
             const data = await response.json();
             const sortedSongs = data.data.songs.sort((a: Song, b: Song) => a.year.year - b.year.year);
             setSongs(sortedSongs);
-            setSortedSongs(sortedSongs);
         };
 
         if (selectedCountry) {
             fetchSongs();
         }
     }, [selectedCountry]);
-
-    const handleSort = (key: keyof Song) => {
-        let direction: 'asc' | 'desc' = 'asc';
-        if (sortConfig.key === key && sortConfig.direction === 'asc') {
-            direction = 'desc';
-        }
-        setSortConfig({ key, direction });
-    };
-
-    useEffect(() => {
-        const sortedData = [...songs].sort((a, b) => {
-            const valueA = a[sortConfig.key];
-            const valueB = b[sortConfig.key];
-
-            if (typeof valueA === 'object' && typeof valueB === 'object') {
-                const nestedValueA = Object.values(valueA)[0];
-                const nestedValueB = Object.values(valueB)[0];
-
-                if (nestedValueA < nestedValueB) {
-                    return sortConfig.direction === 'asc' ? -1 : 1;
-                }
-                if (nestedValueA > nestedValueB) {
-                    return sortConfig.direction === 'asc' ? 1 : -1;
-                }
-            } else {
-                if (valueA < valueB) {
-                    return sortConfig.direction === 'asc' ? -1 : 1;
-                }
-                if (valueA > valueB) {
-                    return sortConfig.direction === 'asc' ? 1 : -1;
-                }
-            }
-
-            return 0;
-        });
-        setSortedSongs(sortedData);
-    }, [songs, sortConfig]);
 
     const chartData = {
         labels: songs.map((song) => song.year.year),
@@ -130,16 +88,6 @@ const PlaceChart: React.FC = () => {
             fill: true,
             borderColor: 'rgb(118 163 184)',
             tension: 0.03,
-            pointRadius: songs.map((song) => {
-              const place = song.finalPlace.place;
-              // Adjust the size based on the place
-              return 10 - place + 2; 
-            }),
-            pointHoverRadius: songs.map((song) => {
-              const place = song.finalPlace.place;
-              // Adjust the size on hover based on the place
-              return 12 - place + 2; 
-            }),
           },
         ],
       };
@@ -172,16 +120,14 @@ const PlaceChart: React.FC = () => {
                 />
             </div>
 
-            <div className="mb-8">
-                <Line className="min-h-350 h-[15em]" data={chartData} options={chartOptions as any} />
+            <div className="mb-8 w-full">
+                <LineChart data={chartData} options={chartOptions} />
             </div>
 
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
 
                 <SongTable
-                    songs={sortedSongs}
-                    sortConfig={sortConfig}
-                    onSort={handleSort}
+                    songs={songs}
                 />
             </div>
         </div>

@@ -29,7 +29,7 @@ const CountryDropdown: React.FC<CountryDropdownProps> = ({ countries, selectedCo
     <div className={classNames(className)}>
       <button
         id="country-select"
-        className="text-white bg-slate-600 hover:bg-slate-700 focus:ring-4 focus:outline-none focus:ring-slate-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-slate-500 dark:hover:bg-slate-500 dark:focus:ring-slate-600"
+        className="text-white shadow-sm bg-slate-600 hover:bg-slate-700 focus:ring-4 focus:outline-none focus:ring-slate-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-slate-500 dark:hover:bg-slate-500 dark:focus:ring-slate-600"
         type="button"
         onClick={toggleDropdown}
       >

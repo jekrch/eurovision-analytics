@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface Song {
   id: string;
@@ -16,14 +16,56 @@ interface SortConfig {
 
 interface SongTableProps {
   songs: Song[];
-  sortConfig: SortConfig;
-  onSort: (key: keyof Song) => void;
 }
 
-const SongTable: React.FC<SongTableProps> = ({ songs, sortConfig, onSort }) => {
+const SongTable: React.FC<SongTableProps> = ({ songs }) => {
+  
+  const [sortedSongs, setSortedSongs] = useState<Song[]>([]);
+  const [sortConfig, setSortConfig] = useState<{ key: keyof Song; direction: 'asc' | 'desc' }>({
+      key: 'year',
+      direction: 'asc',
+  });
+  
+  const onSort = (key: keyof Song) => {
+    let direction: 'asc' | 'desc' = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+        direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  useEffect(() => {
+    const sortedData = [...songs].sort((a, b) => {
+        const valueA = a[sortConfig.key];
+        const valueB = b[sortConfig.key];
+
+        if (typeof valueA === 'object' && typeof valueB === 'object') {
+            const nestedValueA = Object.values(valueA)[0];
+            const nestedValueB = Object.values(valueB)[0];
+
+            if (nestedValueA < nestedValueB) {
+                return sortConfig.direction === 'asc' ? -1 : 1;
+            }
+            if (nestedValueA > nestedValueB) {
+                return sortConfig.direction === 'asc' ? 1 : -1;
+            }
+        } else {
+            if (valueA < valueB) {
+                return sortConfig.direction === 'asc' ? -1 : 1;
+            }
+            if (valueA > valueB) {
+                return sortConfig.direction === 'asc' ? 1 : -1;
+            }
+        }
+
+        return 0;
+    });
+    setSortedSongs(sortedData);
+  }, [songs, sortConfig]);
+
   return (
-    <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-      <table className="w-full text-sm text-left rtl:text-right text-gray-400">
+    <div className="relative overflow-x-auto shadow-md sm:rounded-lg shadow-md">
+      <table className="w-full text-sm text-left rtl:text-right text-gray-300">
         <thead className="text-md text-gray-300 bg-slate-600">
           <tr>
             <th
@@ -149,7 +191,7 @@ const SongTable: React.FC<SongTableProps> = ({ songs, sortConfig, onSort }) => {
           </tr>
         </thead>
         <tbody>
-          {songs.map((song, index) => (
+          {sortedSongs.map((song, index) => (
             <tr key={song.id} className={`border-b border-b-stone-400 text-white font-medium ${index % 2 === 0 ? 'bg-[#909fb3]' : 'bg-[#828fa2]'}`}>
               <td className="px-6 py-4">{song.year.year}</td>
               <td className="px-6 py-4">{song.name}</td>
