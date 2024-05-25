@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
-import { Chart, PointElement, registerables } from 'chart.js';
+import { Chart, ChartOptions, PointElement, Tick, registerables } from 'chart.js';
 import CountryDropdown from './CountryDropdown';
 import SongTable from './SongTable';
 import LineChart from './Chart';
@@ -25,6 +25,10 @@ const PlaceChart: React.FC = () => {
     const [countries, setCountries] = useState<Country[]>([]);
     const [selectedCountry, setSelectedCountry] = useState<string>('Croatia');
     const [songs, setSongs] = useState<Song[]>([]);
+
+    const years = Array.from(new Set(songs.map((song) => song.year.year))).sort((a, b) => a - b);
+    const minYear = years[0];
+    const maxYear = years[years.length - 1];
 
     useEffect(() => {
         const fetchCountries = async () => {
@@ -80,28 +84,73 @@ const PlaceChart: React.FC = () => {
     }, [selectedCountry]);
 
     const chartData = {
-        labels: songs.map((song) => song.year.year),
+        labels: Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i),
         datasets: [
-          {
-            label: 'Final Place',
-            data: songs.map((song) => song.finalPlace.place),
-            fill: true,
-            borderColor: 'rgb(118 163 184)',
-            tension: 0.03,
-          },
+            {
+                label: 'Final Place',
+                data: Array.from({ length: maxYear - minYear + 1 }, (_, i) => {
+                    const year = minYear + i;
+                    const song = songs.find((song) => song.year.year === year);
+                    return song ? song.finalPlace.place : null;
+                }),
+                fill: false,
+                borderColor: 'rgb(118 163 184)',
+                tension: 0.03,
+                spanGaps: true,
+                pointRadius: (context: any) => {
+                    console.log(context.parsed?.y);
+                    const place = context.parsed?.y;
+                    if (place === null || place === undefined) return 0;
+                    return Math.max(8 - place, 4);
+                },
+                pointHoverRadius: 10,
+            }
         ],
-      };
+    };
 
-    const chartOptions = {
+    const chartOptions: ChartOptions = {
         maintainAspectRatio: false,
         scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: 'Year',
+                },
+            },
             y: {
                 reverse: true,
-                min: 1,
-                max: Math.max(...songs.map((song) => song.finalPlace.place), 1),
+                min: -2,
+                max: songs.length > 0 ? Math.max(...songs.map((song) => song.finalPlace.place + 2)) : 10,
                 ticks: {
-                    callback: (value: number) =>
-                        `${value}${value === 1 ? 'st' : value === 2 ? 'nd' : value === 3 ? 'rd' : 'th'}`,
+                    stepSize: 7,
+                    callback: (value: number | string) => {
+                        if (typeof value === 'number' && Number.isInteger(value) && value >= 1) {
+                            return `${value}${value === 1 ? 'st' : value === 2 ? 'nd' : value === 3 ? 'rd' : 'th'}`;
+                        }
+                        return '';
+                    },
+                },
+                afterBuildTicks: (scale) => {
+                    // remove any 0 ticks (we want to start at 1)
+                    const ticks = scale.ticks.filter((t: Tick) => t.value > 0);
+                    if (scale.axis !== 'y') return;
+                    if (ticks.length > 0) {
+                        ticks.reverse();
+                        if (ticks[0].value !== 1) {
+                            ticks.unshift({
+                                value: 1,
+                                label: '1st',
+                            });
+                        }
+                        if (ticks.length > 1 && ticks[2].value == 1) {
+                            ticks.splice(1, 1);
+                        }
+                    }
+                    scale.ticks = ticks;
+                },
+                title: {
+                    display: true,
+                    text: 'Final Place',
                 },
             },
         },
@@ -109,7 +158,7 @@ const PlaceChart: React.FC = () => {
 
     return (
         <div className="container pb-20 mb-0">
-            <h1 className="text-lg font-bold my-3 text-center text-gray-500">Grand Final Results By Country</h1>
+            <h1 className="text-lg font-bold my-3 text-center text-gray-500 tracking-tighter">Grand Final Results By Country</h1>
 
             <div className="mb-4 flex items-center justify-center relative">
                 <CountryDropdown

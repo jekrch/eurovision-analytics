@@ -64,7 +64,7 @@ const CountryDropdown: React.FC<CountryDropdownProps> = ({ countries, selectedCo
           aria-labelledby="country-select"
         >
           {countries.map((country) => (
-            <li key={country.id}>
+            <li key={country.name}>
               <a
                 href="#"
                 className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"

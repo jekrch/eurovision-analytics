@@ -1,11 +1,8 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import Home from './components/Home';
+import { createRoot } from 'react-dom/client';
 import './index.css';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <Home />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+const container = document.getElementById('root');
+const root = createRoot(container as any); // createRoot(container!) if you use TypeScript
+root.render(<Home />);
