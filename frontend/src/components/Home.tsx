@@ -17,7 +17,7 @@ const Home: React.FC = () => {
     <div className="bg-slate-200 min-h-[100vh] w-full">
       <nav className="bg-slate-700 shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-14">
             <div className="flex items-center">
               <span className="text-gray-200 text-xl font-bold font-sans tracking-tighter">
                 Eurovision Analytics
@@ -51,7 +51,7 @@ const Home: React.FC = () => {
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 type="button"
-                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-white"
+                className="inline-flex items-center justify-center p-1 rounded-md text-gray-400 hover:text-white hover:bg-slate-600 focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-slate-300"
                 aria-controls="mobile-menu"
                 aria-expanded="false"
               >
