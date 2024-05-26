@@ -1,128 +1,203 @@
-const getOrCreateTooltip = (chart: any) => {
-    let tooltipEl = chart.canvas.parentNode.querySelector('div');
-  
-    if (!tooltipEl) {
-      tooltipEl = document.createElement('div');
-      tooltipEl.style.zIndex = '9999';
-      tooltipEl.style.background = 'rgba(0, 0, 0, 0.5)';
-      tooltipEl.style.borderRadius = '3px';
-      tooltipEl.style.color = 'white';
-      tooltipEl.style.opacity = 1;
-      tooltipEl.style.pointerEvents = 'none';
-      tooltipEl.style.position = 'absolute';
-      tooltipEl.style.transform = 'translate(-50%, 0)';
-      tooltipEl.style.transition = 'all .1s ease';
-  
-      const table = document.createElement('table');
-      table.style.margin = '0px';
-  
-      tooltipEl.appendChild(table);
-      chart.canvas.parentNode.appendChild(tooltipEl);
-    }
-  
-    return tooltipEl;
+interface Tooltip {
+  opacity: number;
+  body: Array<{ lines: string[] }>;
+  labelColors: Array<{ backgroundColor: string; borderColor: string }>;
+  options: {
+    bodyFont: { string: string };
+    padding: number;
   };
-  
-  export const externalTooltipHandler = (context: any) => {
-    
-    const {
-      chart,
-      tooltip
-    } = context;
-    const tooltipEl = getOrCreateTooltip(chart);
-  
-    const song = context.chart.data.datasets[tooltip.dataPoints[0].datasetIndex].meta[tooltip.dataPoints[0].dataIndex] as any;
-    console.log(song)
+  caretX: number;
+  caretY: number;
+  dataPoints: Array<{ datasetIndex: number; dataIndex: number }>;
+  title?: string[];
+}
 
-    // hide if no tooltip
-    if (tooltip.opacity === 0) {
-      tooltipEl.style.opacity = 0;
-      return;
-    }
-  
-    // Set Text
-    if (tooltip.body) {
-      const titleLines = tooltip.title || [];
-      const bodyLines = tooltip.body.map((b: any) => b.lines);
-  
-      titleLines.push(`"${song.name}"`);
-      titleLines.push(`${song.artist.name}`);
-
-      const tableHead = document.createElement('thead');
-  
-      titleLines.forEach((title: any, index: number) => {
-
-        const tr = document.createElement('tr') as any;
-        tr.style.borderWidth = 0;
-  
-        const th = document.createElement('th') as any;
-        th.style.borderWidth = 0;
-        const text = document.createTextNode(title);
-        th.appendChild(text);
-  
-        const imageTh = document.createElement('th');
-        th.style.borderWidth = 0;
-
-        // reduce the size/weight of song name and artist
-        if (index > 0) {
-            //th.style.color = '#e9f0f2';
-            th.style.fontSize = '15px'
-            th.style.fontWeight = 'lighter';
-        }
-        tr.appendChild(th);
-        tr.appendChild(imageTh);
-        tableHead.appendChild(tr);
-      });
-  
-      const tableBody = document.createElement('tbody');
-      bodyLines.forEach((body: any, i: any) => {
-        const colors = tooltip.labelColors[i];
-  
-        const span = document.createElement('span');
-        span.style.background = colors.backgroundColor;
-        span.style.borderColor = colors.borderColor;
-        span.style.borderWidth = '2px';
-        span.style.marginRight = '10px';
-        span.style.height = '10px';
-        span.style.width = '10px';
-        span.style.display = 'inline-block';
-  
-        const tr = document.createElement('tr') as any;
-        tr.style.backgroundColor = 'inherit';
-        tr.style.borderWidth = 0;
-  
-        const td = document.createElement('td') as any;
-        td.style.borderWidth = 0;
-  
-        const text = document.createTextNode(body);
-  
-        td.appendChild(span);
-        td.appendChild(text);
-        tr.appendChild(td);
-        tableBody.appendChild(tr);
-      });
-  
-      const tableRoot = tooltipEl.querySelector('table');
-  
-      // Remove old children
-      while (tableRoot.firstChild) {
-        tableRoot.firstChild.remove();
-      }
-  
-      // Add new children
-      tableRoot.appendChild(tableHead);
-      tableRoot.appendChild(tableBody);
-    }
-  
-    const {
-      offsetLeft: positionX,
-      offsetTop: positionY
-    } = chart.canvas;
-  
-    // Display, position, and set styles for font
-    tooltipEl.style.opacity = 1;
-    tooltipEl.style.left = positionX + tooltip.caretX + 'px';
-    tooltipEl.style.top = positionY + tooltip.caretY + 'px';
-    tooltipEl.style.font = tooltip.options.bodyFont.string;
-    tooltipEl.style.padding = tooltip.options.padding + 'px ' + tooltip.options.padding + 'px';
+interface Song {
+  name: string;
+  artist: {
+    name: string;
   };
+}
+
+const getOrCreateTooltip = (chart: any): HTMLDivElement => {
+  const existingTooltip = chart.canvas.parentNode?.querySelector('div');
+  if (existingTooltip) {
+    return existingTooltip as HTMLDivElement;
+  }
+
+  const newTooltip = document.createElement('div');
+  newTooltip.classList.add('tooltip');
+
+  const table = document.createElement('table');
+  table.classList.add('tooltip-table');
+  newTooltip.appendChild(table);
+
+  chart.canvas.parentNode?.appendChild(newTooltip);
+  return newTooltip;
+};
+
+export const songTooltipHandler = (context: any): void => {
+  tooltipHandler(context, createSongMetadataHeader);
+};
+
+export const runningOrderTooltipHandler = (context: any): void => {
+  tooltipHandler(context, createRunningOrderHeader);
+};
+
+const tooltipHandler = (
+  context: { chart: Chart; tooltip: Tooltip },
+  createMetadataHeader: (tooltip: Tooltip, chart: Chart) => HTMLTableSectionElement
+): void => {
+  const { chart, tooltip } = context;
+  const tooltipEl = getOrCreateTooltip(chart);
+
+  if (tooltip.opacity === 0) {
+    tooltipEl.style.opacity = '0';
+    return;
+  }
+
+  if (tooltip.body) {
+    const tableHead = createMetadataHeader(tooltip, chart);
+    const tableBody = createTableBody(tooltip);
+    buildTooltipRoot(tooltipEl, tableHead, tableBody);
+  }
+
+  assignTooltipPosition(chart, tooltipEl, tooltip);
+};
+
+const buildTooltipRoot = (
+  tooltipEl: HTMLDivElement,
+  tableHead: HTMLTableSectionElement,
+  tableBody: HTMLTableSectionElement
+): void => {
+  const tableRoot = tooltipEl.querySelector('table')!;
+
+  while (tableRoot.firstChild) {
+    tableRoot.firstChild.remove();
+  }
+
+  tableRoot.appendChild(tableHead);
+  tableRoot.appendChild(tableBody);
+};
+
+const assignTooltipPosition = (chart: any, tooltipEl: HTMLDivElement, tooltip: Tooltip): void => {
+  
+  const { offsetLeft: positionX, offsetTop: positionY } = chart.canvas;
+
+  tooltipEl.style.opacity = '1';
+  tooltipEl.style.left = `${positionX + tooltip.caretX}px`;
+  tooltipEl.style.top = `${positionY + tooltip.caretY}px`;
+  tooltipEl.style.font = tooltip.options.bodyFont.string;
+  tooltipEl.style.padding = `${tooltip.options.padding}px`;
+};
+
+const createTableBody = (tooltip: Tooltip): HTMLTableSectionElement => {
+  const tableBody = document.createElement('tbody');
+
+  tooltip.body.forEach((bodyItem, index) => {
+    const colors = tooltip.labelColors[index];
+
+    const row = document.createElement('tr');
+    row.classList.add('tooltip-row');
+
+    const cell = document.createElement('td');
+    cell.classList.add('tooltip-cell');
+
+    const colorBox = document.createElement('span');
+    colorBox.classList.add('tooltip-color');
+    colorBox.style.backgroundColor = colors.backgroundColor;
+    colorBox.style.borderColor = colors.borderColor;
+
+    const labelText = document.createElement('span');
+    labelText.classList.add('tooltip-text');
+    labelText.textContent = bodyItem.lines.join(' ');
+
+    cell.appendChild(colorBox);
+    cell.appendChild(labelText);
+    row.appendChild(cell);
+    tableBody.appendChild(row);
+  });
+
+  return tableBody;
+};
+
+const createSongMetadataHeader = (tooltip: Tooltip, chart: any): HTMLTableSectionElement => {
+
+  const song = chart.data.datasets[tooltip.dataPoints[0].datasetIndex].meta[
+    tooltip.dataPoints[0].dataIndex
+  ] as Song;
+
+  const titleLines = tooltip.title || [];
+  titleLines.push(`"${song.name}"`);
+  titleLines.push(`${song.artist.name}`);
+  titleLines.push('');
+
+  const tableHead = document.createElement('thead');
+
+  titleLines.forEach((title, index) => {
+    const row = document.createElement('tr');
+    row.classList.add('tooltip-header-row');
+
+    const titleCell = document.createElement('th');
+    titleCell.classList.add('tooltip-header-cell');
+    titleCell.textContent = title;
+
+    if (index > 0) {
+      titleCell.classList.add('tooltip-header-cell-secondary');
+    } else {
+      titleCell.classList.add('tooltip-header-cell-primary');
+    }
+
+    if (index === 1) {
+      titleCell.classList.add('tooltip-header-cell-artist');
+    }
+
+    if (index === 3) {
+      const separator = document.createElement('hr');
+      separator.classList.add('tooltip-separator');
+      titleCell.appendChild(separator);
+    }
+
+    row.appendChild(titleCell);
+    tableHead.appendChild(row);
+  });
+
+  return tableHead;
+};
+
+const createRunningOrderHeader = (tooltip: Tooltip, chart: Chart): HTMLTableSectionElement => {
+  const titleLines = tooltip.title || [];
+  titleLines.push('');
+
+  const tableHead = document.createElement('thead');
+
+  titleLines.forEach((title, index) => {
+    const row = document.createElement('tr');
+    row.classList.add('tooltip-header-row');
+
+    const titleCell = document.createElement('th');
+    titleCell.classList.add('tooltip-header-cell');
+    titleCell.textContent = title;
+
+    if (index > 0) {
+      titleCell.classList.add('tooltip-header-cell-secondary');
+    } else {
+      titleCell.classList.add('tooltip-header-cell-primary');
+    }
+
+    if (index === 1) {
+      titleCell.classList.add('tooltip-header-cell-artist');
+    }
+
+    if (index === 3) {
+      const separator = document.createElement('hr');
+      separator.classList.add('tooltip-separator');
+      titleCell.appendChild(separator);
+    }
+
+    row.appendChild(titleCell);
+    tableHead.appendChild(row);
+  });
+
+  return tableHead;
+};

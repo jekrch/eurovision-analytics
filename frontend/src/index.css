@@ -1,3 +1,69 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
+.tooltip {
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 3px;
+    color: white;
+    opacity: 1;
+    pointer-events: none;
+    position: absolute;
+    transform: translate(-50%, 0);
+    transition: all 0.1s ease;
+  }
+  
+  .tooltip-table {
+    margin: 10px;
+  }
+  
+  .tooltip-row {
+    background-color: inherit;
+    border-width: 0;
+  }
+  
+  .tooltip-cell {
+    display: flex;
+    align-items: center;
+  }
+  
+  .tooltip-color {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 8px;
+    border-radius: 50%;
+  }
+  
+  .tooltip-text {
+    font-size: 14px;
+  }
+  
+  .tooltip-header-row {
+    border-width: 0;
+  }
+  
+  .tooltip-header-cell {
+    border-width: 0;
+  }
+  
+  .tooltip-header-cell-primary {
+    background-color: rgba(149, 176, 207, 0.6);
+  }
+  
+  .tooltip-header-cell-secondary {
+    color: #e9f0f2;
+    font-size: 15px;
+    font-weight: lighter;
+  }
+  
+  .tooltip-header-cell-artist {
+    padding-top: 7px;
+    font-style: italic;
+  }
+  
+  .tooltip-separator {
+    margin-bottom: 8px;
+    margin-top: 8px;
+  }

@@ -4,7 +4,7 @@ import { Chart, ChartOptions, PointElement, Tick, registerables } from 'chart.js
 import CountryDropdown from './CountryDropdown';
 import SongTable from './SongTable';
 import LineChart from './Chart';
-import { externalTooltipHandler } from '../utils/TooltipUtils';
+import { songTooltipHandler } from '../utils/TooltipUtils';
 
 Chart.register(...registerables);
 
@@ -36,14 +36,27 @@ const PlaceChart: React.FC = () => {
             const response = await fetch('http://localhost:4000/graphql', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                // fetch countries that have at least one song that made it to the finals (sorry Andorra)
                 body: JSON.stringify({
                     query: `
                         query {
-                            countries(options: { sort: [{ name: ASC }] }) {
-                            name
+                            countries(where: {
+                                songs: {
+                                    finalPlace: {
+                                        place_GT: 0
+                                    }
+                                }
+                            }, options: {
+                                sort: [{
+                                        name: ASC
+                                    }
+                                ]
+                            }) {
+                                name
                             }
                         }
-                    `,
+                        
+                        `,
                 }),
             });
             const data = await response.json();
@@ -103,8 +116,8 @@ const PlaceChart: React.FC = () => {
                 borderColor: 'rgb(118 163 184)',
                 tension: 0.03,
                 spanGaps: true,
+                pointHitRadius: 20,
                 pointRadius: (context: any) => {
-                    console.log(context.parsed?.y);
                     const place = context.parsed?.y;
                     if (place === null || place === undefined) return 0;
                     return Math.max(8 - place, 4);
@@ -132,7 +145,7 @@ const PlaceChart: React.FC = () => {
             tooltip: {
               enabled: false,
               position: 'nearest',
-              external: externalTooltipHandler
+              external: songTooltipHandler
             }
           },
         scales: {

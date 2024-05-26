@@ -1,5 +1,6 @@
 import React from 'react';
 import PlaceChart from './PlaceChart';
+import RunningOrderChart from './RunningOrderChart';
 
 const Home: React.FC = () => {
   return (
@@ -8,6 +9,7 @@ const Home: React.FC = () => {
         <span className="w-full inline-block bg-slate-500 text-gray-200 text-center text-xl font-bold font-sans py-2 tracking-tighter shadow-md">Eurovision Analytics</span>
         <div className="mx-10 items-center justify-center flex flex-row">
           <PlaceChart/>
+          {/* <RunningOrderChart/> */}
         </div>
       </div>
     </>
