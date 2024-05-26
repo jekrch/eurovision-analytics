@@ -4,6 +4,7 @@ import { Chart, ChartOptions, PointElement, Tick, registerables } from 'chart.js
 import CountryDropdown from './CountryDropdown';
 import SongTable from './SongTable';
 import LineChart from './Chart';
+import { externalTooltipHandler } from '../utils/TooltipUtils';
 
 Chart.register(...registerables);
 
@@ -91,7 +92,12 @@ const PlaceChart: React.FC = () => {
                 data: Array.from({ length: maxYear - minYear + 1 }, (_, i) => {
                     const year = minYear + i;
                     const song = songs.find((song) => song.year.year === year);
-                    return song ? song.finalPlace.place : null;
+                                        return song ? song.finalPlace.place : null;
+                }),
+                meta: Array.from({ length: maxYear - minYear + 1 }, (_, i) => {
+                    const year = minYear + i;
+                    const song = songs.find((song) => song.year.year === year);
+                    return song || null;
                 }),
                 fill: false,
                 borderColor: 'rgb(118 163 184)',
@@ -104,12 +110,31 @@ const PlaceChart: React.FC = () => {
                     return Math.max(8 - place, 4);
                 },
                 pointHoverRadius: 10,
+                pointBackgroundColor: (context: any) => {
+                    const place = context.parsed?.y;
+                    return place === 1 ? '#db7f60' : 'rgb(118 163 184)';
+                },
+                pointBorderColor: (context: any) => {
+                    const place = context.parsed?.y;
+                    return place === 1 ? '#db7f60' : 'rgb(118 163 184)';
+                },
+                pointStyle: (context: any) => {
+                    const place = context.parsed?.y;
+                    return place === 1 ? 'rectRot' : 'circle';
+                },
             }
         ],
     };
-
+    
     const chartOptions: ChartOptions = {
         maintainAspectRatio: false,
+        plugins: {
+            tooltip: {
+              enabled: false,
+              position: 'nearest',
+              external: externalTooltipHandler
+            }
+          },
         scales: {
             x: {
                 title: {
