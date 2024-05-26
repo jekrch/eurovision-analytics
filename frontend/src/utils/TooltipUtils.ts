@@ -1,3 +1,5 @@
+import { Song } from "../models/Song";
+
 interface Tooltip {
   opacity: number;
   body: Array<{ lines: string[] }>;
@@ -10,13 +12,6 @@ interface Tooltip {
   caretY: number;
   dataPoints: Array<{ datasetIndex: number; dataIndex: number }>;
   title?: string[];
-}
-
-interface Song {
-  name: string;
-  artist: {
-    name: string;
-  };
 }
 
 const getOrCreateTooltip = (chart: any): HTMLDivElement => {

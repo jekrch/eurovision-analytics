@@ -5,22 +5,10 @@ import CountryDropdown from './CountryDropdown';
 import SongTable from './SongTable';
 import LineChart from './Chart';
 import { songTooltipHandler } from '../utils/TooltipUtils';
+import { Song } from '../models/Song';
+import { Country } from '../models/Country';
 
 Chart.register(...registerables);
-
-interface Song {
-    id: string;
-    name: string;
-    year: { year: number };
-    artist: { name: string };
-    finalPlace: { place: number };
-    totalPoints: number;
-}
-
-interface Country {
-    id: string;
-    name: string;
-}
 
 const PlaceChart: React.FC = () => {
     const [countries, setCountries] = useState<Country[]>([]);

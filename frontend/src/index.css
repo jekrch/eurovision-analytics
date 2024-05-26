@@ -22,7 +22,7 @@
     background-color: inherit;
     border-width: 0;
   }
-  
+
   .tooltip-cell {
     display: flex;
     align-items: center;
@@ -66,4 +66,35 @@
   .tooltip-separator {
     margin-bottom: 8px;
     margin-top: 8px;
+  }
+
+  .ripple {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: ripple 0.6s linear;
+    transform: scale(0);
+  }
+  
+  @keyframes ripple {
+    to {
+      transform: scale(4);
+      opacity: 0;
+    }
+  }
+
+  .menu-transition-enter {
+    max-height: 0;
+  }
+  .menu-transition-enter-active {
+    max-height: 1000px;
+    transition: max-height 500ms ease-in-out;
+  }
+  .menu-transition-exit {
+    max-height: 1000px;
+  }
+  .menu-transition-exit-active {
+    max-height: 0;
+    transition: max-height 500ms ease-in-out;
   }

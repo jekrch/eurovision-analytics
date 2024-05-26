@@ -7,13 +7,16 @@
     "start": "webpack-dev-server --mode development --open"
   },
   "dependencies": {
+    "@headlessui/react": "^2.0.4",
     "@types/react": "^18.3.2",
     "@types/react-dom": "^18.3.0",
+    "@types/react-transition-group": "^4.4.10",
     "autoprefixer": "^10.4.19",
     "classnames": "^2.5.1",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.3.1",
+    "react-transition-group": "^4.4.5",
     "tailwindcss": "^3.4.3"
   },
   "devDependencies": {
