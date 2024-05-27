@@ -13,9 +13,12 @@ interface AverageFinalPlaceData {
 
 const RunningOrderChart: React.FC = () => {
     const [data, setData] = useState<AverageFinalPlaceData[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
+            setIsLoading(true);
+
             const response = await fetch('http://localhost:4000/graphql', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -39,12 +42,17 @@ const RunningOrderChart: React.FC = () => {
 
             const averageFinalPlaceData = calculateAveragePlacePerRunningOrder(result);
 
+            //await delay(4000);
             setData(averageFinalPlaceData);
+            setIsLoading(false);
         };
 
         fetchData();
     }, []);
 
+    function delay(ms: number) {
+        return new Promise( resolve => setTimeout(resolve, ms) );
+    }
 
     /**
      * For each finalRunningOrder, get the average final place and return data in array for chart
@@ -128,7 +136,13 @@ const RunningOrderChart: React.FC = () => {
             </h1>
 
             <div className="mb-8 w-full">
-                <LineChart data={chartData} options={chartOptions} />
+                {isLoading ? (
+                    <div className="flex items-center justify-center h-44">
+                        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-r-2 border-b-6 border-gray-800"></div>
+                    </div>
+                ) : (
+                    <LineChart data={chartData} options={chartOptions} />
+                )}
             </div>
         </div>
     );
