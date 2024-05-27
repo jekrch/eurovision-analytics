@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { CSSTransition } from 'react-transition-group';
 
 interface NavItem {
@@ -14,7 +14,33 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
 
   const [isOpen, setIsOpen] = useState(false);
-  const [activeItem, setActiveItem] = useState();
+  const [activeItem, setActiveItem] = useState<string>();
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  function selectTab(tabPath: string) {
+    props.handleTabChange(tabPath);
+    setActiveItem(tabPath);
+    console.log(tabPath);
+  }
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleOutsideClick);
+    } else {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+
+  }, [isOpen]);
 
   return (
     <nav className="bg-slate-700 shadow-md">
@@ -29,12 +55,11 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
                 {props.items.map((item) => (
                   <button
                     key={item.path}
-                    className={`${
-                      activeItem === item.path
+                    className={`${activeItem === item.path
                         ? 'bg-slate-600 text-white'
                         : 'text-gray-300 hover:bg-slate-600 hover:text-white'
-                    } px-3 py-2 rounded-md text-sm font-medium`}
-                    onClick={() => props.handleTabChange(item.path)}
+                      } px-3 py-2 rounded-md text-sm font-medium`}
+                    onClick={() => selectTab(item.path)}
                   >
                     {item.label}
                   </button>
@@ -42,7 +67,7 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
               </div>
             </div>
           </div>
-          <div className="-mr-2 flex md:hidden">
+          <div ref={menuRef} className="-mr-2 flex md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
               type="button"
@@ -53,19 +78,16 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
               <span className="sr-only">Open main menu</span>
               <div className={`relative w-6 h-6`}>
                 <div
-                  className={`absolute top-1 left-0 w-full h-0.5 bg-white rounded transition-all duration-300 ${
-                    isOpen ? 'top-1/2 rotate-45 transform -translate-y-1/2' : ''
-                  }`}
+                  className={`absolute top-1 left-0 w-full h-0.5 bg-white rounded transition-all duration-300 ${isOpen ? 'top-1/2 rotate-45 transform -translate-y-1/2' : ''
+                    }`}
                 ></div>
                 <div
-                  className={`absolute top-1/2 left-0 transform -translate-y-1/2 w-full h-0.5 bg-white rounded transition-all duration-300 ${
-                    isOpen ? 'opacity-0' : ''
-                  }`}
+                  className={`absolute top-1/2 left-0 transform -translate-y-1/2 w-full h-0.5 bg-white rounded transition-all duration-300 ${isOpen ? 'opacity-0' : ''
+                    }`}
                 ></div>
                 <div
-                  className={`absolute bottom-1 left-0 w-full h-0.5 bg-white rounded transition-all duration-300 ${
-                    isOpen ? 'bottom-1/2 -rotate-45 transform translate-y-1/2' : ''
-                  }`}
+                  className={`absolute bottom-1 left-0 w-full h-0.5 bg-white rounded transition-all duration-300 ${isOpen ? 'bottom-1/2 -rotate-45 transform translate-y-1/2' : ''
+                    }`}
                 ></div>
               </div>
             </button>
@@ -79,17 +101,16 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
           classNames="menu-transition"
           unmountOnExit
         >
-          <div className="md:hidden" id="mobile-menu">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <div className="md:hidden min-w-full" id="mobile-menu">
+            <div className="px-2 pt-2 pb-3 space-y-1 pr-4 min-w-full">
               {props.items.map((item) => (
                 <button
                   key={item.path}
-                  className={`${
-                    activeItem === item.path
+                  className={`${activeItem === item.path
                       ? 'bg-slate-600 text-white'
                       : 'text-gray-300 hover:bg-slate-600 hover:text-white'
-                  } block px-3 py-2 rounded-md text-base font-medium`}
-                  onClick={() => props.handleTabChange(item.path)}
+                    } block px-3b py-2 rounded-md text-base font-medium min-w-full text-left pl-3`}
+                  onClick={() => { selectTab(item.path) }}
                 >
                   {item.label}
                 </button>
