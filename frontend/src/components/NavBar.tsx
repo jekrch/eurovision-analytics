@@ -3,7 +3,8 @@ import { CSSTransition } from 'react-transition-group';
 
 interface NavItem {
   label: string;
-  path: string;
+  path?: string;
+  url?: string;
 }
 
 interface NavbarProps {
@@ -18,8 +19,12 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
   function selectTab(navItem: NavItem) {
+    if (navItem.url) {
+      window.open(navItem.url,'_blank');
+      return;
+    }
     setActiveItem(navItem.path);
-    props.handleTabChange(navItem.path);
+    props.handleTabChange(navItem.path!);
   }
 
   useEffect(() => {
@@ -54,7 +59,7 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
                 {props.items.map((item) => (
                   <button
                     key={item.path}
-                    className={`${activeItem === item.path
+                    className={`${activeItem === item.path && !item.url
                         ? 'bg-slate-600 text-white'
                         : 'text-gray-300 hover:bg-slate-600 hover:text-white'
                       } px-3 py-2 rounded-md text-sm font-medium`}

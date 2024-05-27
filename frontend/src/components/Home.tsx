@@ -1,10 +1,7 @@
-// Home.tsx
 import React, { useState } from 'react';
-import { CSSTransition } from 'react-transition-group';
 import PlaceChart from './PlaceChart';
-import RunningOrderChart from './RunningOrderChart';
 import Navbar from './NavBar';
-import LanguageChart from './LanguageChart';
+import StatCharts from './StatCharts';
 
 const Home: React.FC = () => {
   const [activeTab, setActiveTab] = useState('placeChart');
@@ -16,19 +13,26 @@ const Home: React.FC = () => {
   };
 
   const navItems = [
-    { label: 'Place Chart', path: 'placeChart' },
-    { label: 'Running Order Chart', path: 'runningOrderChart' },
+    { label: 'Placement By Country', path: 'placeChart' },
+    { label: 'Stat Charts', path: 'runningOrderChart' },
+    { label: 'Neo4J', url: 'http://localhost:7474' },
+    { label: 'GraphQL', url: 'http://localhost:4000' },
   ];
 
   return (
     <div className="bg-slate-200 min-h-[100vh] w-full">
-      <Navbar items={navItems} handleTabChange={handleTabChange}/>
+      <Navbar 
+        items={navItems} 
+        handleTabChange={handleTabChange}
+      />
+      
       <div className="mx-10 items-center justify-center flex flex-row">
-        {activeTab !== 'placeChart' ? <PlaceChart /> : 
-          <div className="m-auto">
-            <RunningOrderChart/>  
-            <LanguageChart/> 
-          </div>}
+        {
+          activeTab !== 'placeChart' ? 
+          <PlaceChart /> : 
+          <StatCharts/>
+        } 
+      
       </div>
     </div>
   );

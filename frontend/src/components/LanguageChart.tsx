@@ -129,7 +129,7 @@ const LanguageChart: React.FC = () => {
 
     return (
         <div className="container pb-20 mb-0">
-            <h1 className="text-lg font-bold my-3 text-center text-gray-500 tracking-tighter">
+            <h1 className="text-lg font-bold my-3 mb-6 text-center text-gray-500 tracking-tighter bg-gray-300">
                 Language Distribution
             </h1>
 

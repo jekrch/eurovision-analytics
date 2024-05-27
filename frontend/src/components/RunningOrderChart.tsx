@@ -50,10 +50,6 @@ const RunningOrderChart: React.FC = () => {
         fetchData();
     }, []);
 
-    function delay(ms: number) {
-        return new Promise( resolve => setTimeout(resolve, ms) );
-    }
-
     /**
      * For each finalRunningOrder, get the average final place and return data in array for chart
      * @param result 
@@ -131,7 +127,7 @@ const RunningOrderChart: React.FC = () => {
 
     return (
         <div className="container pb-0 mb-0">
-            <h1 className="text-lg font-bold my-3 text-center text-gray-500 tracking-tighter">
+            <h1 className="text-lg font-bold my-3 text-center text-gray-500 tracking-tighter bg-gray-300">
                 Average Final Place by Final Running Order
             </h1>
 
