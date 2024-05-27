@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Pie } from 'react-chartjs-2';
 import { Chart, ChartOptions, ChartType, ScaleType, registerables } from 'chart.js';
+import { countTooltipHandler } from '../utils/TooltipUtils';
 
 Chart.register(...registerables);
 
@@ -104,6 +105,11 @@ const LanguageChart: React.FC = () => {
         maintainAspectRatio: false,
         cutout: '30%', // donut
         plugins: {
+            tooltip: {
+                enabled: false,
+                position: 'nearest',
+                external: countTooltipHandler,
+            },
             legend: {
                 position: 'bottom',
                 labels: {

@@ -35,8 +35,8 @@ export const songTooltipHandler = (context: any): void => {
   tooltipHandler(context, createSongMetadataHeader);
 };
 
-export const runningOrderTooltipHandler = (context: any): void => {
-  tooltipHandler(context, createRunningOrderHeader);
+export const countTooltipHandler = (context: any): void => {
+  tooltipHandler(context, createCountHeader);
 };
 
 const tooltipHandler = (
@@ -160,7 +160,7 @@ const createSongMetadataHeader = (tooltip: Tooltip, chart: any): HTMLTableSectio
   return tableHead;
 };
 
-const createRunningOrderHeader = (tooltip: Tooltip, chart: Chart): HTMLTableSectionElement => {
+const createCountHeader = (tooltip: Tooltip, chart: Chart): HTMLTableSectionElement => {
   const titleLines = tooltip.title || [];
   titleLines.push('');
 

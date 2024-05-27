@@ -50,6 +50,8 @@
   
   .tooltip-header-cell-primary {
     background-color: rgba(149, 176, 207, 0.6);
+    padding-left: 15px;
+    padding-right: 15px;
   }
   
   .tooltip-header-cell-secondary {

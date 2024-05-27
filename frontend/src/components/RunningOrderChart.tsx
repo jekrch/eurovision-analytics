@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart, ChartOptions, PointElement, Tick, registerables } from 'chart.js';
 import LineChart from './Chart';
-import { runningOrderTooltipHandler, songTooltipHandler } from '../utils/TooltipUtils';
+import { countTooltipHandler, songTooltipHandler } from '../utils/TooltipUtils';
 
 Chart.register(...registerables);
 
@@ -98,7 +98,7 @@ const RunningOrderChart: React.FC = () => {
             tooltip: {
                 enabled: false,
                 position: 'nearest',
-                external: runningOrderTooltipHandler,
+                external: countTooltipHandler,
             },
         },
         scales: {

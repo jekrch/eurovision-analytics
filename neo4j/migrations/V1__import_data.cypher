@@ -15,9 +15,11 @@ MERGE (s)-[:BROADCAST_BY]->(b)
 
 WITH s, row
 UNWIND split(row.language, ',') AS language
-  MERGE (l:Language {name: trim(language)})
-  MERGE (s)-[:IN_LANGUAGE]->(l)
-
+WITH s, row, trim(language) AS trimmedLanguage
+WHERE trimmedLanguage <> ''
+MERGE (l:Language {name: trimmedLanguage})
+MERGE (s)-[:IN_LANGUAGE]->(l)
+  
 WITH s, row
 UNWIND split(row.songwriters, ',') AS songwriter
   MERGE (sw:Songwriter {name: trim(songwriter)})
