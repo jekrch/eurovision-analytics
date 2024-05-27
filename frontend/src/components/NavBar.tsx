@@ -110,7 +110,7 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
               {props.items.map((item) => (
                 <button
                   key={item.path}
-                  className={`${activeItem === item.path
+                  className={`${activeItem === item.path && !item.url
                       ? 'bg-slate-500 text-white'
                       : 'text-gray-300 hover:bg-slate-600 hover:text-white'
                     } block px-3b py-2 rounded-md text-base font-medium min-w-full text-left pl-3 hover:bg-slate-500`}

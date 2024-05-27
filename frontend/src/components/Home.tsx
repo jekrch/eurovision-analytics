@@ -5,11 +5,9 @@ import StatCharts from './StatCharts';
 
 const Home: React.FC = () => {
   const [activeTab, setActiveTab] = useState('placeChart');
-  const [isOpen, setIsOpen] = useState(false);
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
-    setIsOpen(false);
   };
 
   const navItems = [
@@ -27,8 +25,9 @@ const Home: React.FC = () => {
       />
       
       <div className="mx-10 items-center justify-center flex flex-row">
+        
         {
-          activeTab !== 'placeChart' ? 
+          activeTab === 'placeChart' ? 
           <PlaceChart /> : 
           <StatCharts/>
         } 
