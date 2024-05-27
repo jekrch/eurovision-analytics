@@ -17,10 +17,9 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
   const [activeItem, setActiveItem] = useState<string>();
   const menuRef = useRef<HTMLDivElement>(null);
 
-  function selectTab(tabPath: string) {
-    props.handleTabChange(tabPath);
-    setActiveItem(tabPath);
-    console.log(tabPath);
+  function selectTab(navItem: NavItem) {
+    setActiveItem(navItem.path);
+    props.handleTabChange(navItem.path);
   }
 
   useEffect(() => {
@@ -43,7 +42,7 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
   }, [isOpen]);
 
   return (
-    <nav className="bg-slate-700 shadow-md">
+    <nav className="bg-slate-600 shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14">
           <div className="flex items-center">
@@ -59,7 +58,7 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
                         ? 'bg-slate-600 text-white'
                         : 'text-gray-300 hover:bg-slate-600 hover:text-white'
                       } px-3 py-2 rounded-md text-sm font-medium`}
-                    onClick={() => selectTab(item.path)}
+                    onClick={() => selectTab(item)}
                   >
                     {item.label}
                   </button>
@@ -107,10 +106,10 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
                 <button
                   key={item.path}
                   className={`${activeItem === item.path
-                      ? 'bg-slate-600 text-white'
+                      ? 'bg-slate-500 text-white'
                       : 'text-gray-300 hover:bg-slate-600 hover:text-white'
-                    } block px-3b py-2 rounded-md text-base font-medium min-w-full text-left pl-3`}
-                  onClick={() => { selectTab(item.path) }}
+                    } block px-3b py-2 rounded-md text-base font-medium min-w-full text-left pl-3 hover:bg-slate-500`}
+                  onClick={() => { selectTab(item) }}
                 >
                   {item.label}
                 </button>
