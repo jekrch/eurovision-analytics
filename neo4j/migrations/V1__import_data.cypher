@@ -15,7 +15,7 @@ MERGE (s)-[:BROADCAST_BY]->(b)
 
 WITH s, row
 UNWIND split(row.language, ',') AS language
-  MERGE (l:Language {name: trim(replace(replace(language, '(', ''), ')', ''))})
+  MERGE (l:Language {name: trim(language)})
   MERGE (s)-[:IN_LANGUAGE]->(l)
 
 WITH s, row

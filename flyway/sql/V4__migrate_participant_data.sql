@@ -21,13 +21,13 @@ ON CONFLICT (name) DO NOTHING;
 -- songs
 INSERT INTO song (name, language, broadcaster, wiki_url, artist_id, country_id, year)
 SELECT DISTINCT ON (spd.song, spd.year)
-  spd.song,
-  spd.language,
-  spd.broadcaster,
-  spd.song_wiki_url,
-  a.id AS artist_id,
-  c.id AS country_id,
-  spd.year
+    spd.song,
+    TRIM(REGEXP_REPLACE(spd.language, '[^a-zA-Z,]', '', 'g')) AS language,
+    spd.broadcaster,
+    spd.song_wiki_url,
+    a.id AS artist_id,
+    c.id AS country_id,
+    spd.year
 FROM staging_participant_data spd
 JOIN artist a ON spd.artist = a.name
 JOIN country c ON spd.country = c.code

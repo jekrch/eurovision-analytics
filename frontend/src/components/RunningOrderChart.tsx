@@ -130,7 +130,7 @@ const RunningOrderChart: React.FC = () => {
     };
 
     return (
-        <div className="container pb-20 mb-0">
+        <div className="container pb-0 mb-0">
             <h1 className="text-lg font-bold my-3 text-center text-gray-500 tracking-tighter">
                 Average Final Place by Final Running Order
             </h1>

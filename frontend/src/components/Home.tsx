@@ -4,6 +4,7 @@ import { CSSTransition } from 'react-transition-group';
 import PlaceChart from './PlaceChart';
 import RunningOrderChart from './RunningOrderChart';
 import Navbar from './NavBar';
+import LanguageChart from './LanguageChart';
 
 const Home: React.FC = () => {
   const [activeTab, setActiveTab] = useState('placeChart');
@@ -23,7 +24,11 @@ const Home: React.FC = () => {
     <div className="bg-slate-200 min-h-[100vh] w-full">
       <Navbar items={navItems} handleTabChange={handleTabChange}/>
       <div className="mx-10 items-center justify-center flex flex-row">
-        {activeTab === 'placeChart' ? <PlaceChart /> : <RunningOrderChart />}
+        {activeTab !== 'placeChart' ? <PlaceChart /> : 
+          <div className="m-auto">
+            <RunningOrderChart/>  
+            <LanguageChart/> 
+          </div>}
       </div>
     </div>
   );
