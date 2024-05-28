@@ -28,9 +28,17 @@ The database is containerized using Docker Compose for easy setup and deployment
 
     This command will start the PostgreSQL database and run the Flyway migrations, creating the db schema and importing the data from the CSV files.
 
-4. Connect to the database:
+4. Connect to interactive data services
 
-    You can connect to the PostgreSQL database using a database client with the following details:
+      | Service      | URL                    |
+      |--------------|------------------------|
+      | Frontend Home| http://localhost:3000 |
+      | GraphQL      | http://localhost:4000 |
+      | Neo4J        | http://localhost:7474 |
+
+5. Connect to the PostgreSQL database:
+
+    You can connect using a database client with the following details:
 
     - Host: `localhost`
     - Port: `5432`
@@ -40,77 +48,11 @@ The database is containerized using Docker Compose for easy setup and deployment
 
     The staging tables will be available in the `eurovision` database, and you can query them to access the imported data.
 
-## Use Cases <a id="use_cases"></a> :mag_right:
-
-You can answer all kinds of interesting, complex questions with this normalized data. Here are several examples to get you started!
-
-#### 1. Which Eurovision songs were written in an imaginary language?
-
-```sql
-SELECT year, country, broadcaster, artist, song, language
-FROM song_view
-WHERE language = 'Imaginary'
-```
-
-| year | country | broadcaster | artist      | song      | language  |
-|------|---------|-------------|-------------|-----------|-----------|
-| 2003 | Belgium | RTBF        | Urban Trad  | Sanomi    | Imaginary |
-| 2008 | Belgium | VRT         | Ishtar      | Julissi | Imaginary |
-| ...  | ...     | ...         | ...         | ...       | ...       |
-
-#### 2. Which artists competed in the most contests?
-
-```sql
-SELECT
-  COUNT(*) AS song_count,
-  artist,
-  STRING_AGG(CAST(year AS TEXT), ', ' ORDER BY year ASC) as contest_years,
-  STRING_AGG(DISTINCT country, ', ') as country
-FROM song_view
-GROUP BY artist
-HAVING COUNT(*) > 1
-ORDER BY COUNT(*) DESC;
-```
-
-| song_count | artist               | contest_years            | country                |
-|------------|----------------------|--------------------------|------------------------|
-| 4          | Peter, Sue and Marc  | 1971, 1976, 1979, 1981   | Switzerland            |
-| 4          | Valentina Monetta    | 2012, 2013, 2014, 2017   | San Marino             |
-| 4          | Fud Leclerc          | 1956, 1958, 1960, 1962   | Belgium                |
-| 3          | Hot Eyes             | 1984, 1985, 1988         | Denmark                |
-| 3          | Lys Assia            | 1956, 1957, 1958         | Switzerland            |
-| ...        | ...                  | ...                      | ...                    |
-
-#### 3. Which composers had the most songs in Eurovision?
-
-```sql
-SELECT
-  COUNT(DISTINCT sv.song_id) AS song_count,
-  c.name,
-  STRING_AGG(CAST(sv.year AS TEXT), ', ' ORDER BY year ASC) as contest_years,
-  STRING_AGG(DISTINCT sv.country, ', ') as country
-FROM song_view sv
-JOIN song_composer sc ON sc.song_id = sv.song_id
-JOIN composer c ON c.id = sc.composer_id
-GROUP BY c.name
-HAVING COUNT(*) > 1
-ORDER BY COUNT(*) DESC;
-```
-
-| song_count | name               | contest_years                                                            | country                                           |
-|------------|--------------------|-------------------------------------------------------------------------------------|---------------------------------------------------|
-| 24         | Ralph Siegel       | 1974, 1976, 1979, 1980, 1980, 1981, 1982, 1985, 1987, 1988, 1990, 1992, 1994, 1997, 1999, 2002, 2003, 2006, 2009, 2012, 2013, 2014, 2015, 2017 | Germany, Luxembourg, Montenegro, San Marino, Switzerland |
-| 16         | Bernd Meinunger    | 1979, 1980, 1980, 1981, 1982, 1985, 1987, 1988, 1992, 1994, 1997, 1999, 2002, 2003, 2006, 2009 | Germany, Luxembourg, Montenegro, Switzerland      |
-| 12         | Thomas G:son       | 2001, 2006, 2007, 2010, 2012, 2012, 2013, 2015, 2015, 2016, 2016, 2018    | Cyprus, Denmark, Georgia, Malta, Spain, Sweden    |
-| 9          | Dimitris Kontopoulos | 2009, 2013, 2014, 2016, 2017, 2018, 2019, 2021, 2021                     | Azerbaijan, Greece, Moldova, Russia               |
-| ...        | ...                | ...                                                                       | ...                                               |
-
 ## Neo4j graph data modeling :bar_chart:
 
+Explore and analyze ESC contest data using graph-based queries and visualizations.
 
-In addition to PostgreSQL, this project also supports loading the Eurovision data into Neo4j which allows you to explore and analyze the data using graph-based queries and visualizations.
-
-The Neo4j database is automatically set up and populated with data using Docker Compose. The provided `docker-compose.yml` file includes the necessary configuration to start a Neo4j container and execute the data migration scripts.
+The Neo4j database is automatically set up and populated with data via `docker-compose up -d`. The provided `docker-compose.yml` file includes the necessary configuration to start a Neo4j container and execute the data migration scripts.
 
 <img width="958" alt="image" src="https://github.com/jekrch/eurovision-analytics/assets/8173930/aabb4661-6636-4ec7-86c0-7d2df993f7af">
 
@@ -174,6 +116,71 @@ RETURN ro, s, a, y
 ```
 <img width="956" alt="image" src="https://github.com/jekrch/eurovision-analytics/assets/8173930/506c19f2-9f84-4663-b2b4-7e7191643cc8">
 
+
+## PostgreSQL Use Cases <a id="use_cases"></a> :mag_right:
+
+In addition to Neo4J, this project also provides a PostgreSQL database. You can answer all kinds of interesting, complex questions with normalized data. Here are several examples to get you started.
+
+#### 1. Which Eurovision songs were written in an imaginary language?
+
+```sql
+SELECT year, country, broadcaster, artist, song, language
+FROM song_view
+WHERE language = 'Imaginary'
+```
+
+| year | country | broadcaster | artist      | song      | language  |
+|------|---------|-------------|-------------|-----------|-----------|
+| 2003 | Belgium | RTBF        | Urban Trad  | Sanomi    | Imaginary |
+| 2008 | Belgium | VRT         | Ishtar      | Julissi | Imaginary |
+| ...  | ...     | ...         | ...         | ...       | ...       |
+
+#### 2. Which artists competed in the most contests?
+
+```sql
+SELECT
+  COUNT(*) AS song_count,
+  artist,
+  STRING_AGG(CAST(year AS TEXT), ', ' ORDER BY year ASC) as contest_years,
+  STRING_AGG(DISTINCT country, ', ') as country
+FROM song_view
+GROUP BY artist
+HAVING COUNT(*) > 1
+ORDER BY COUNT(*) DESC;
+```
+
+| song_count | artist               | contest_years            | country                |
+|------------|----------------------|--------------------------|------------------------|
+| 4          | Peter, Sue and Marc  | 1971, 1976, 1979, 1981   | Switzerland            |
+| 4          | Valentina Monetta    | 2012, 2013, 2014, 2017   | San Marino             |
+| 4          | Fud Leclerc          | 1956, 1958, 1960, 1962   | Belgium                |
+| 3          | Hot Eyes             | 1984, 1985, 1988         | Denmark                |
+| 3          | Lys Assia            | 1956, 1957, 1958         | Switzerland            |
+| ...        | ...                  | ...                      | ...                    |
+
+#### 3. Which composers had the most songs in Eurovision?
+
+```sql
+SELECT
+  COUNT(DISTINCT sv.song_id) AS song_count,
+  c.name,
+  STRING_AGG(CAST(sv.year AS TEXT), ', ' ORDER BY year ASC) as contest_years,
+  STRING_AGG(DISTINCT sv.country, ', ') as country
+FROM song_view sv
+JOIN song_composer sc ON sc.song_id = sv.song_id
+JOIN composer c ON c.id = sc.composer_id
+GROUP BY c.name
+HAVING COUNT(*) > 1
+ORDER BY COUNT(*) DESC;
+```
+
+| song_count | name               | contest_years                                                            | country                                           |
+|------------|--------------------|-------------------------------------------------------------------------------------|---------------------------------------------------|
+| 24         | Ralph Siegel       | 1974, 1976, 1979, 1980, 1980, 1981, 1982, 1985, 1987, 1988, 1990, 1992, 1994, 1997, 1999, 2002, 2003, 2006, 2009, 2012, 2013, 2014, 2015, 2017 | Germany, Luxembourg, Montenegro, San Marino, Switzerland |
+| 16         | Bernd Meinunger    | 1979, 1980, 1980, 1981, 1982, 1985, 1987, 1988, 1992, 1994, 1997, 1999, 2002, 2003, 2006, 2009 | Germany, Luxembourg, Montenegro, Switzerland      |
+| 12         | Thomas G:son       | 2001, 2006, 2007, 2010, 2012, 2012, 2013, 2015, 2015, 2016, 2016, 2018    | Cyprus, Denmark, Georgia, Malta, Spain, Sweden    |
+| 9          | Dimitris Kontopoulos | 2009, 2013, 2014, 2016, 2017, 2018, 2019, 2021, 2021                     | Azerbaijan, Greece, Moldova, Russia               |
+| ...        | ...                | ...                                                                       | ...                                               |
 
 ## GraphQL API :rocket:
 
