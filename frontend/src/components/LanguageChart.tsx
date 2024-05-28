@@ -130,13 +130,13 @@ const LanguageChart: React.FC = () => {
 
     return (
             <div className="container pb-10 m-auto max-w-[40em]">
-                <div className="mb-8 w-full mt-8">
+                <div className="mb-8 w-full mt-0">
                     {isLoading ? (
                         <div className="flex items-center justify-center h-44">
                             <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-r-2 border-b-6 border-gray-800"></div>
                         </div>
                     ) : (
-                        <div className="h-full min-h-[800px] w-[85%] m-auto">
+                        <div className="h-full min-h-[900px] w-[75%] m-auto">
                             <Pie data={chartData} options={chartOptions} />
                         </div>
                     )}
