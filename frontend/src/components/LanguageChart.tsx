@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Pie } from 'react-chartjs-2';
 import { Chart, ChartOptions, ChartType, ScaleType, registerables } from 'chart.js';
 import { countTooltipHandler } from '../utils/TooltipUtils';
+import Header from './Header';
 
 Chart.register(...registerables);
 
@@ -128,23 +129,19 @@ const LanguageChart: React.FC = () => {
     };
 
     return (
-        <div className="container pb-20 mb-0">
-            <h1 className="text-lg font-bold my-3 mb-6 text-center text-gray-500 tracking-tighter bg-gray-300">
-                Language Distribution
-            </h1>
-
-            <div className="mb-8 w-full">
-                {isLoading ? (
-                    <div className="flex items-center justify-center h-44">
-                        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-r-2 border-b-6 border-gray-800"></div>
-                    </div>
-                ) : (
-                    <div className="h-full min-h-[600px] w-full" style={{ margin: '0 auto' }}>
-                    <Pie data={chartData} options={chartOptions} />
+            <div className="container pb-10 m-auto max-w-[40em]">
+                <div className="mb-8 w-full mt-8">
+                    {isLoading ? (
+                        <div className="flex items-center justify-center h-44">
+                            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-r-2 border-b-6 border-gray-800"></div>
+                        </div>
+                    ) : (
+                        <div className="h-full min-h-[800px] w-[85%] m-auto">
+                            <Pie data={chartData} options={chartOptions} />
+                        </div>
+                    )}
                 </div>
-                )}
             </div>
-        </div>
     );
 };
 

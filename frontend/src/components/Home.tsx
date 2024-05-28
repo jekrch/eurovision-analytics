@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PlaceChart from './PlaceChart';
 import Navbar from './NavBar';
 import StatCharts from './StatCharts';
+import Header from './Header';
 
 const Home: React.FC = () => {
   const [activeTab, setActiveTab] = useState('placeChart');
@@ -18,17 +19,24 @@ const Home: React.FC = () => {
   ];
 
   return (
-    <div className="bg-slate-200 min-h-[100vh] w-full">
+    <div className="bg-slate-200 min-h-[100vh] min-w-[100vw] max-w-[100vw] ">
       <Navbar 
         items={navItems} 
         handleTabChange={handleTabChange}
       />
       
-      <div className="mx-10 items-center justify-center flex flex-row">
+      <div className="mx-10 items-center justify-center flex flex-col">
         
         {
           activeTab === 'placeChart' ? 
-          <PlaceChart /> : 
+          <>
+            <Header 
+                title={'Grand Final Results By Country'}
+                className="mt-4"
+            />
+            
+            <PlaceChart /> 
+          </>: 
           <StatCharts/>
         } 
       

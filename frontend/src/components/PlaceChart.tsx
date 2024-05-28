@@ -7,6 +7,7 @@ import LineChart from './Chart';
 import { songTooltipHandler } from '../utils/TooltipUtils';
 import { Song } from '../models/Song';
 import { Country } from '../models/Country';
+import Header from './Header';
 
 Chart.register(...registerables);
 
@@ -183,19 +184,18 @@ const PlaceChart: React.FC = () => {
     };
 
     return (
-        <div className="container pb-20 mb-0">
-            <h1 className="text-lg font-bold my-3 text-center text-gray-500 tracking-tighter">Grand Final Results By Country</h1>
+        <div className="container marker:mt-4 mb-8 m-auto">
 
-            <div className="mb-4 flex items-center justify-center relative">
+            <div className="mb-4 mt-6 flex items-center justify-center">
                 <CountryDropdown
-                    className="mb-4"
+                    className="mb-4 absolute mt-14"
                     countries={countries}
                     selectedCountry={selectedCountry}
                     onCountryChange={setSelectedCountry}
                 />
             </div>
 
-            <div className="mb-8 w-full">
+            <div className="mb-8 max-w-[90vw] m-auto mt-[4em] max-w-[40em]">
                 <LineChart data={chartData} options={chartOptions} />
             </div>
 

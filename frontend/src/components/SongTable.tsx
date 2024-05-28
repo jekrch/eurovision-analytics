@@ -64,7 +64,7 @@ const SongTable: React.FC<SongTableProps> = ({ songs }) => {
   }, [songs, sortConfig]);
 
   return (
-    <div className="relative overflow-x-auto shadow-md sm:rounded-lg shadow-md">
+    <div className="relative overflow-x-auto sm:rounded-lg shadow-md">
       <table className="w-full text-sm text-left rtl:text-right text-gray-300">
         <thead className="text-md text-gray-300 bg-slate-600">
           <tr>

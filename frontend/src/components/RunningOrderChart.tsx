@@ -3,6 +3,7 @@ import { Line } from 'react-chartjs-2';
 import { Chart, ChartOptions, PointElement, Tick, registerables } from 'chart.js';
 import LineChart from './Chart';
 import { countTooltipHandler, songTooltipHandler } from '../utils/TooltipUtils';
+import Header from './Header';
 
 Chart.register(...registerables);
 
@@ -126,18 +127,17 @@ const RunningOrderChart: React.FC = () => {
     };
 
     return (
-        <div className="container pb-0 mb-0">
-            <h1 className="text-lg font-bold my-3 text-center text-gray-500 tracking-tighter bg-gray-300">
-                Average Final Place by Final Running Order
-            </h1>
+        <div className="container marker:mt-4 m-auto max-w-[40em] px-5">
 
-            <div className="mb-8 w-full">
+            <div className="mb-8">
                 {isLoading ? (
                     <div className="flex items-center justify-center h-44">
                         <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-r-2 border-b-6 border-gray-800"></div>
                     </div>
                 ) : (
-                    <LineChart data={chartData} options={chartOptions} />
+                    <div className="mb-8 min-w-full mt-[2em]">
+                        <LineChart data={chartData} options={chartOptions} />
+                    </div>
                 )}
             </div>
         </div>
