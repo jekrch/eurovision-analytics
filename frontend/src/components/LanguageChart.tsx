@@ -136,7 +136,7 @@ const LanguageChart: React.FC = () => {
                             <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-r-2 border-b-6 border-gray-800"></div>
                         </div>
                     ) : (
-                        <div className="h-full min-h-[900px] w-[75%] m-auto">
+                        <div className="h-[900px] w-[75%] mx-auto mt-0">
                             <Pie data={chartData} options={chartOptions} />
                         </div>
                     )}
