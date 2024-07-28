@@ -26,7 +26,7 @@ The database is containerized using Docker Compose for easy setup and deployment
     docker-compose up -d
     ```
 
-    This command will start both databases, and run Flyway migrations, which generate the db schema and import data from CSV files. 3 interactive services will also be started which you can use to start exploring the data.
+    This command will start both databases, and run the Flyway migrations, which generate the db schema and import data from CSV files. 3 interactive services will also be started which you can use to start exploring the data.
 
 4. Connect to interactive data services
 
