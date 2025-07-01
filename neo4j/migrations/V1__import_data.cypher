@@ -21,10 +21,16 @@ MERGE (l:Language {name: trimmedLanguage})
 MERGE (s)-[:IN_LANGUAGE]->(l)
   
 WITH s, row
+WHERE row.songwriters IS NOT NULL AND trim(row.songwriters) <> ''
 UNWIND split(row.songwriters, ',') AS songwriter
-  MERGE (sw:Songwriter {name: trim(songwriter)})
-  MERGE (s)-[:WRITTEN_BY]->(sw)
+WITH s, row, trim(songwriter) AS trimmedSongwriter
+WHERE trimmedSongwriter IS NOT NULL 
+  AND trimmedSongwriter <> '' 
+  AND size(trimmedSongwriter) > 0
+MERGE (sw:Songwriter {name: trimmedSongwriter})
+MERGE (s)-[:WRITTEN_BY]->(sw)
 
+WITH DISTINCT s, row
 FOREACH (conductor IN CASE WHEN row.conductor IS NOT NULL THEN [row.conductor] ELSE [] END |
   MERGE (co:Conductor {id: row.conductor_id, name: conductor})
   MERGE (s)-[:CONDUCTED_BY]->(co)

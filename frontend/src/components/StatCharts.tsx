@@ -2,6 +2,8 @@ import React from 'react';
 import RunningOrderChart from './RunningOrderChart';
 import LanguageChart from './LanguageChart';
 import Header from './Header';
+import SongwriterPowerRankings from './SongwriterPowerRankings';
+import SongwriterHighchartsDashboard from './SongwriterHighchartsDashboard';
 
 const StatCharts: React.FC = () => {
   return (
@@ -14,6 +16,8 @@ const StatCharts: React.FC = () => {
                 title={'Language Distribution'}
             />
             <LanguageChart/> 
+            {/* <SongwriterPowerRankings/> */}
+            <SongwriterHighchartsDashboard/>
           </div>
   );
 };
