@@ -7,7 +7,7 @@ SELECT
   a.name AS artist,
   s.name AS song,
   s.language,
-  STRING_AGG(cp.name, ', ' ORDER BY cp.name) AS songwriters,
+  STRING_AGG(cp.name, ',' ORDER BY cp.name) FILTER (WHERE TRIM(cp.name, chr(160)) <> '') AS songwriters,
   cd.name AS conductor,
   a.id AS artist_id, 
   s.id AS song_id,
