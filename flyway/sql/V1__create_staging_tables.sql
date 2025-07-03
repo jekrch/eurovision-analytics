@@ -17,7 +17,8 @@ CREATE TABLE staging_participant_data (
   song_wiki_url TEXT,
   language TEXT,
   songwriters TEXT,
-  conductors TEXT
+  conductors TEXT,
+  youtube_url TEXT
 );
 
 CREATE TABLE staging_result_data (

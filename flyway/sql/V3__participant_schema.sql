@@ -28,7 +28,8 @@ CREATE TABLE IF NOT EXISTS song (
   wiki_url TEXT,
   artist_id BIGINT REFERENCES artist,
   country_id BIGINT REFERENCES country,
-  year BIGINT
+  year BIGINT,
+  youtube_url TEXT
 ); 
 
 -- join tables 

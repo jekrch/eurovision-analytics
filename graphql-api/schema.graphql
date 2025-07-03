@@ -16,6 +16,7 @@ type Broadcaster {
 type Artist {
     id: ID!
     name: String!
+    wikiUrl: String
     songs: [Song!]! @relationship(type: "PERFORMED_BY", direction: IN)
 }
 
@@ -30,6 +31,8 @@ type Song {
     songwriters: [Songwriter!]! @relationship(type: "WRITTEN_BY", direction: OUT)
     conductor: Conductor @relationship(type: "CONDUCTED_BY", direction: OUT)
     totalPoints: Int
+    youtubeUrl: String
+    wikiUrl: String
     finalPlace: FinalPlace @relationship(type: "PLACED", direction: OUT)
     finalRunningOrder: Int
     runningOrder: FinalRunningOrder @relationship(type: "RUNNING_ORDER", direction: OUT)

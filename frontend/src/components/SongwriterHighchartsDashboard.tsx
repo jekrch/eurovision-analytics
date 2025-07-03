@@ -2,6 +2,25 @@ import React, { useEffect, useState } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 
+interface Song {
+    id: string;
+    name: string;
+    youtubeUrl: string | null;
+    finalPlace?: {
+        place: number;
+    };
+    country?: {
+        name: string;
+    };
+    year?: {
+        year: number;
+    };
+    artist?: {
+        name: string;
+    };
+    totalPoints?: number;
+}
+
 interface SongwriterStats {
     name: string;
     songCount: number;
@@ -12,11 +31,20 @@ interface SongwriterStats {
     topTens: number;
     songs: string[];
     countries: string[];
+    songDetails: Song[];
 }
+
+// YouTube thumbnail utility functions
+const getYouTubeThumbnailUrl = (videoId: string | null): string | null => {
+    if (!videoId) return null;
+    return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+};
 
 const SongwriterHighchartsDashboard: React.FC = () => {
     const [songwriters, setSongwriters] = useState<SongwriterStats[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [selectedSongwriter, setSelectedSongwriter] = useState<SongwriterStats | null>(null);
+    const [showSongTable, setShowSongTable] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -31,7 +59,10 @@ const SongwriterHighchartsDashboard: React.FC = () => {
                             songwriters {
                                 name
                                 songs {
+                                    id
                                     name
+                                    youtubeUrl
+                                    totalPoints
                                     finalPlace {
                                         place
                                     }
@@ -40,6 +71,9 @@ const SongwriterHighchartsDashboard: React.FC = () => {
                                     }
                                     year {
                                         year
+                                    }
+                                    artist {
+                                        name
                                     }
                                 }
                             }
@@ -72,7 +106,8 @@ const SongwriterHighchartsDashboard: React.FC = () => {
                             wins: places.filter((p: number) => p === 1).length,
                             topTens: places.filter((p: number) => p <= 10).length,
                             songs: songsWithPlacement.map((s: any) => `${s.name} (${s.year?.year || 'N/A'})`),
-                            countries: Array.from(uniqueCountries)
+                            countries: Array.from(uniqueCountries),
+                            songDetails: songsWithPlacement
                         };
                     })
                     .filter((w: SongwriterStats | null) => w !== null)
@@ -96,9 +131,18 @@ const SongwriterHighchartsDashboard: React.FC = () => {
     const topByWins = [...songwriters]
         .filter((w: SongwriterStats) => w.wins > 0)
         .sort((a: SongwriterStats, b: SongwriterStats) => b.wins - a.wins)
-        .slice(0, 3);
+        .slice(0, 6);
 
-    // Chart configurations
+    // Click handler for charts
+    const handleChartClick = (songwriterName: string) => {
+        const writer = songwriters.find(w => w.name === songwriterName);
+        if (writer) {
+            setSelectedSongwriter(writer);
+            setShowSongTable(true);
+        }
+    };
+
+    // Chart configurations with click handlers
     const songCountChartOptions: Highcharts.Options = {
         chart: {
             type: 'bar'
@@ -128,7 +172,8 @@ const SongwriterHighchartsDashboard: React.FC = () => {
                 return `<b>${writer.name}</b><br/>
                         Songs: ${writer.songCount}<br/>
                         Countries: ${writer.countries.join(', ')}<br/>
-                        Top 10s: ${writer.topTens}`;
+                        Top 10s: ${writer.topTens}<br/>
+                        <em>Click to see songs</em>`;
             }
         },
         plotOptions: {
@@ -136,7 +181,15 @@ const SongwriterHighchartsDashboard: React.FC = () => {
                 dataLabels: {
                     enabled: true
                 },
-                color: '#3B82F6'
+                color: '#3B82F6',
+                cursor: 'pointer',
+                point: {
+                    events: {
+                        click: function(this: any) {
+                            handleChartClick(topBySongCount[this.index].name);
+                        }
+                    }
+                }
             }
         },
         credits: {
@@ -179,14 +232,23 @@ const SongwriterHighchartsDashboard: React.FC = () => {
                 return `<b>${writer.name}</b><br/>
                         Average Place: ${writer.avgPlace.toFixed(1)}<br/>
                         Best Place: ${writer.bestPlace}<br/>
-                        Worst Place: ${writer.worstPlace}`;
+                        Worst Place: ${writer.worstPlace}<br/>
+                        <em>Click to see songs</em>`;
             }
         },
         plotOptions: {
             column: {
                 pointPadding: 0.2,
                 borderWidth: 0,
-                color: '#10B981'
+                color: '#10B981',
+                cursor: 'pointer',
+                point: {
+                    events: {
+                        click: function(this: any) {
+                            handleChartClick(topBySongCount[this.index].name);
+                        }
+                    }
+                }
             }
         },
         credits: {
@@ -246,7 +308,15 @@ const SongwriterHighchartsDashboard: React.FC = () => {
                 },
                 tooltip: {
                     headerFormat: '<b>{point.key}</b><br>',
-                    pointFormat: 'Songs: {point.x}<br>Best Place: {point.y}'
+                    pointFormat: 'Songs: {point.x}<br>Best Place: {point.y}<br><em>Click to see songs</em>'
+                },
+                cursor: 'pointer',
+                point: {
+                    events: {
+                        click: function(this: any) {
+                            handleChartClick(this.name);
+                        }
+                    }
                 }
             }
         },
@@ -269,10 +339,10 @@ const SongwriterHighchartsDashboard: React.FC = () => {
             type: 'pie'
         },
         title: {
-            text: 'Top 3 Songwriters by Wins'
+            text: 'Top 5 Songwriters by Wins'
         },
         tooltip: {
-            pointFormat: '{series.name}: <b>{point.y} wins</b><br/>Songs Written: <b>{point.songCount}</b>'
+            pointFormat: '{series.name}: <b>{point.y} wins</b><br/>Songs Written: <b>{point.songCount}</b><br/><em>Click to see songs</em>'
         },
         accessibility: {
             point: {
@@ -287,7 +357,14 @@ const SongwriterHighchartsDashboard: React.FC = () => {
                     enabled: true,
                     format: '<b>{point.name}</b>: {point.y} wins'
                 },
-                colors: ['#FFD700', '#C0C0C0', '#CD7F32'] // Gold, Silver, Bronze
+                colors: ['#FFD700', '#C0C0C0', '#CD7F32'], // Gold, Silver, Bronze
+                point: {
+                    events: {
+                        click: function(this: any) {
+                            handleChartClick(this.name);
+                        }
+                    }
+                }
             }
         },
         credits: {
@@ -370,6 +447,133 @@ const SongwriterHighchartsDashboard: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Song Details Modal/Table */}
+            {showSongTable && selectedSongwriter && (
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+                    <div className="relative top-20 mx-auto p-5 border w-11/12 max-w-6xl shadow-lg rounded-md bg-white">
+                        <div className="mt-3">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-lg font-bold text-gray-900">
+                                    Songs by {selectedSongwriter.name}
+                                </h3>
+                                <button
+                                    onClick={() => {
+                                        setShowSongTable(false);
+                                        setSelectedSongwriter(null);
+                                    }}
+                                    className="text-gray-400 hover:text-gray-600"
+                                >
+                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {/* Songs Table */}
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y divide-gray-200">
+                                    <thead className="bg-gray-50">
+                                        <tr>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Thumbnail
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Song
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Artist
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Country
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Year
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Place
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Points
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                        {selectedSongwriter.songDetails
+                                            .sort((a, b) => (b.year?.year || 0) - (a.year?.year || 0))
+                                            .map((song) => (
+                                                <tr key={song.id} className="hover:bg-gray-50">
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        {song.youtubeUrl ? (
+                                                            <a
+                                                                href={`https://www.youtube.com/watch?v=${song.youtubeUrl}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="block"
+                                                            >
+                                                                <img
+                                                                    src={getYouTubeThumbnailUrl(song.youtubeUrl) || '/placeholder.png'}
+                                                                    alt={`${song.name} thumbnail`}
+                                                                    className="h-16 w-24 object-cover rounded hover:opacity-80 transition-opacity"
+                                                                />
+                                                            </a>
+                                                        ) : (
+                                                            <div className="h-16 w-24 bg-gray-200 rounded flex items-center justify-center text-gray-400 text-xs">
+                                                                No video
+                                                            </div>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <div className="text-sm font-medium text-gray-900">{song.name}</div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <div className="text-sm text-gray-900">{song.artist?.name || 'N/A'}</div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <div className="text-sm text-gray-900">{song.country?.name || 'N/A'}</div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <div className="text-sm text-gray-900">{song.year?.year || 'N/A'}</div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                                            ${song.finalPlace?.place === 1 ? 'bg-yellow-100 text-yellow-800' : 
+                                                              song.finalPlace?.place && song.finalPlace.place <= 3 ? 'bg-green-100 text-green-800' :
+                                                              song.finalPlace?.place && song.finalPlace.place <= 10 ? 'bg-blue-100 text-blue-800' :
+                                                              'bg-gray-100 text-gray-800'}`}>
+                                                            {song.finalPlace?.place || 'N/A'}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <div className="text-sm text-gray-900">{song.totalPoints || 'N/A'}</div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* Summary Stats */}
+                            <div className="mt-4 pt-4 border-t border-gray-200">
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                    <div>
+                                        <span className="font-semibold">Total Songs:</span> {selectedSongwriter.songCount}
+                                    </div>
+                                    <div>
+                                        <span className="font-semibold">Wins:</span> {selectedSongwriter.wins}
+                                    </div>
+                                    <div>
+                                        <span className="font-semibold">Top 10s:</span> {selectedSongwriter.topTens}
+                                    </div>
+                                    <div>
+                                        <span className="font-semibold">Avg Place:</span> {selectedSongwriter.avgPlace.toFixed(1)}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 services:
   db:
@@ -12,6 +12,11 @@ services:
       - ./flyway/sql:/flyway/sql
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d eurovision"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   flyway:
     image: flyway/flyway
@@ -19,7 +24,8 @@ services:
     volumes:
       - ./flyway/sql:/flyway/sql
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   neo4j:
     container_name: neo4j
@@ -27,19 +33,21 @@ services:
       context: ./neo4j/
       dockerfile: Dockerfile
     ports:
-      - 7474:7474
-      - 7687:7687
+      - "7474:7474"
+      - "7687:7687"
     depends_on:
-      - db
-      - flyway
-    
+      db:
+        condition: service_healthy
+      flyway:
+        condition: service_started # a one-off container, so we just wait for it to have started
+
   graphql-api:
     build:
       context: ./graphql-api
       dockerfile: Dockerfile
     container_name: graphql-api
     ports:
-      - 4000:4000
+      - "4000:4000"
     depends_on:
       - neo4j
     environment:
@@ -53,9 +61,9 @@ services:
       dockerfile: Dockerfile
     container_name: frontend
     ports:
-      - 3000:3000
+      - "3000:3000"
     depends_on:
       - graphql-api
-      
+
 volumes:
   data:

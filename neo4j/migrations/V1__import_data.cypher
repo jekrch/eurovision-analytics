@@ -8,6 +8,11 @@ MERGE (b:Broadcaster {name: row.broadcaster})
 MERGE (a:Artist {id: row.artist_id, name: row.artist})
 MERGE (s:Song {id: row.song_id, name: row.song})
 
+// Add URL properties 
+SET a.wikiUrl = row.artist_wiki_url
+SET s.youtubeUrl = row.youtube_url
+SET s.wikiUrl = row.song_wiki_url
+
 MERGE (y)-[:HAS_SONG]->(s)
 MERGE (s)-[:PERFORMED_BY]->(a)
 MERGE (s)-[:REPRESENTS]->(c)

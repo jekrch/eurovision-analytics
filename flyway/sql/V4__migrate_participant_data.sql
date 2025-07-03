@@ -19,7 +19,7 @@ WHERE conductors IS NOT NULL
 ON CONFLICT (name) DO NOTHING;
 
 -- songs
-INSERT INTO song (name, language, broadcaster, wiki_url, artist_id, country_id, year)
+INSERT INTO song (name, language, broadcaster, wiki_url, artist_id, country_id, year, youtube_url)
 SELECT DISTINCT ON (spd.song, spd.year)
     spd.song,
     TRIM(REGEXP_REPLACE(spd.language, '[^a-zA-Z,]', '', 'g')) AS language,
@@ -27,7 +27,8 @@ SELECT DISTINCT ON (spd.song, spd.year)
     spd.song_wiki_url,
     a.id AS artist_id,
     c.id AS country_id,
-    spd.year
+    spd.year, 
+    spd.youtube_url
 FROM staging_participant_data spd
 JOIN artist a ON spd.artist = a.name
 JOIN country c ON spd.country = c.code
