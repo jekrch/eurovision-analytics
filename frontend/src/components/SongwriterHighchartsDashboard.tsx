@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
+import 'highcharts/highcharts-more';
 
 interface Song {
     id: string;
@@ -51,28 +52,37 @@ const SongwriterHighchartsDashboard: React.FC = () => {
     const [sortKey, setSortKey] = useState<SortKey>('year');
     const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
-    const themeColors = {
-        primary: '#475569', // slate-600
-        secondary: '#64748b', // slate-500
-        tertiary: '#94a3b8', // slate-400
-        background: '#e2e8f0', // slate-200
-        cardBg: '#f8fafc', // slate-50
-        text: '#1e293b', // slate-800
-        border: '#cbd5e1', // slate-300
-    };
+    // Earthy color palette for chart elements only
+    const chartColors = [
+        '#75c8ae', // Mint/Teal
+        '#e5771e', // Dark Orange
+        '#f4a127', // Light Orange
+        '#5a3d2b', // Dark Brown
+        '#ffecb4', // Light Cream
+        '#8ab5a3', // Lighter teal variant
+        '#c9935f', // Mid orange-brown
+        '#6d9987', // Darker teal variant
+        '#d4a574', // Light brown
+        '#4a7c68', // Deep teal
+        '#b87333', // Copper
+        '#9fc5b8', // Pale teal
+        '#cd853f', // Peru
+        '#5e8072', // Sage green
+        '#daa520', // Goldenrod
+    ];
 
-    // Highcharts theme
+    // Highcharts theme with blue-gray UI styling
     Highcharts.setOptions({
-        colors: [themeColors.primary, themeColors.secondary, themeColors.tertiary, '#cbd5e1', '#e2e8f0'],
+        colors: chartColors,
         chart: {
-            backgroundColor: themeColors.cardBg,
+            backgroundColor: 'transparent',
             style: {
                 fontFamily: 'system-ui, -apple-system, sans-serif'
             }
         },
         title: {
             style: {
-                color: themeColors.text,
+                color: '#e2e8f0',
                 fontSize: '16px',
                 fontWeight: '600'
             }
@@ -80,25 +90,40 @@ const SongwriterHighchartsDashboard: React.FC = () => {
         xAxis: {
             labels: {
                 style: {
-                    color: themeColors.text
+                    color: '#94a3b8'
                 }
-            }
+            },
+            lineColor: '#475569',
+            tickColor: '#475569'
         },
         yAxis: {
             labels: {
                 style: {
-                    color: themeColors.text
+                    color: '#94a3b8'
                 }
             },
             title: {
                 style: {
-                    color: themeColors.text
+                    color: '#94a3b8'
                 }
-            }
+            },
+            gridLineColor: '#334155'
         },
         legend: {
             itemStyle: {
-                color: themeColors.text
+                color: '#e2e8f0',
+                fontWeight: '400'
+            },
+            itemHoverStyle: {
+                color: '#f1f5f9'
+            }
+        },
+        tooltip: {
+            backgroundColor: '#334155',
+            borderColor: '#475569',
+            borderRadius: 6,
+            style: {
+                color: '#f1f5f9'
             }
         }
     });
@@ -232,7 +257,7 @@ const SongwriterHighchartsDashboard: React.FC = () => {
         .sort((a: SongwriterStats, b: SongwriterStats) => b.songCount - a.songCount)
         .slice(0, 10);
 
-    // Get top 3 by wins
+    // Get top 6 by wins
     const topByWins = [...songwriters]
         .filter((w: SongwriterStats) => w.wins > 0)
         .sort((a: SongwriterStats, b: SongwriterStats) => b.wins - a.wins)
@@ -250,7 +275,8 @@ const SongwriterHighchartsDashboard: React.FC = () => {
     // Chart configurations with click handlers
     const songCountChartOptions: Highcharts.Options = {
         chart: {
-            type: 'bar'
+            type: 'bar',
+            backgroundColor: 'transparent'
         },
         title: {
             text: 'Top 10 Songwriters by Number of Songs'
@@ -284,7 +310,11 @@ const SongwriterHighchartsDashboard: React.FC = () => {
         plotOptions: {
             bar: {
                 dataLabels: {
-                    enabled: true
+                    enabled: true,
+                    style: {
+                        color: '#e2e8f0',
+                        textOutline: '1px #1e293b'
+                    }
                 },
                 cursor: 'pointer',
                 point: {
@@ -293,7 +323,8 @@ const SongwriterHighchartsDashboard: React.FC = () => {
                             handleChartClick(topBySongCount[this.index].name);
                         }
                     }
-                }
+                },
+                colorByPoint: true
             }
         },
         credits: {
@@ -306,16 +337,17 @@ const SongwriterHighchartsDashboard: React.FC = () => {
         }]
     };
 
-    const avgPlaceChartOptions: Highcharts.Options = {
+    // Multi-line chart for placement statistics
+    const placementStatsChartOptions: Highcharts.Options = {
         chart: {
-            type: 'column'
+            type: 'line',
+            backgroundColor: 'transparent'
         },
         title: {
-            text: 'Average Final Placement (Lower is Better)'
+            text: 'Placement Statistics by Songwriter'
         },
         xAxis: {
             categories: topBySongCount.map((w: SongwriterStats) => w.name),
-            crosshair: true,
             labels: {
                 rotation: -45,
                 style: {
@@ -323,32 +355,39 @@ const SongwriterHighchartsDashboard: React.FC = () => {
                 }
             }
         },
-        yAxis: {
-            min: 0,
-            reversed: true,
+        yAxis: [{
             title: {
-                text: 'Average Placement'
-            }
-        },
+                text: 'Placement',
+                style: {
+                    color: chartColors[0]
+                }
+            },
+            reversed: true,
+            min: 1,
+            max: 30
+        }, {
+            title: {
+                text: 'Number of Songs',
+                style: {
+                    color: chartColors[4]
+                }
+            },
+            opposite: true
+        }],
         tooltip: {
-            formatter: function(this: any) {
-                const writer = topBySongCount[this.point.index];
-                return `<b>${writer.name}</b><br/>
-                        Average Place: ${writer.avgPlace.toFixed(1)}<br/>
-                        Best Place: ${writer.bestPlace}<br/>
-                        Worst Place: ${writer.worstPlace}<br/>
-                        <em>Click to see songs</em>`;
-            }
+            shared: true
         },
         plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0,
+            line: {
                 cursor: 'pointer',
+                lineWidth: 2,
                 point: {
                     events: {
                         click: function(this: any) {
-                            handleChartClick(topBySongCount[this.index].name);
+                            const seriesIndex = (this.series as any).index;
+                            if (seriesIndex < 3) {
+                                handleChartClick(topBySongCount[this.index].name);
+                            }
                         }
                     }
                 }
@@ -358,64 +397,91 @@ const SongwriterHighchartsDashboard: React.FC = () => {
             enabled: false
         },
         series: [{
-            name: 'Average Placement',
+            name: 'Average Place',
+            type: 'line',
+            data: topBySongCount.map((w: SongwriterStats) => parseFloat(w.avgPlace.toFixed(1))),
+            color: chartColors[0],
+            marker: {
+                symbol: 'circle',
+                radius: 5
+            }
+        }, {
+            name: 'Best Place',
+            type: 'line',
+            data: topBySongCount.map((w: SongwriterStats) => w.bestPlace),
+            color: chartColors[1],
+            dashStyle: 'ShortDot',
+            marker: {
+                symbol: 'diamond',
+                radius: 5
+            }
+        }, {
+            name: 'Worst Place',
+            type: 'line',
+            data: topBySongCount.map((w: SongwriterStats) => w.worstPlace),
+            color: chartColors[2],
+            dashStyle: 'Dash',
+            marker: {
+                symbol: 'square',
+                radius: 4
+            }
+        }, {
+            name: 'Number of Songs',
             type: 'column',
-            data: topBySongCount.map((w: SongwriterStats) => parseFloat(w.avgPlace.toFixed(1)))
+            yAxis: 1,
+            data: topBySongCount.map((w: SongwriterStats) => w.songCount),
+            color: chartColors[4],
+            opacity: 0.3
         }]
     };
 
-    const bestPlaceChartOptions: Highcharts.Options = {
+    // Bubble chart for avg placement vs songs with visible names
+    const avgPlacementBubbleChartOptions: Highcharts.Options = {
         chart: {
-            type: 'scatter',
+            type: 'bubble',
+            backgroundColor: 'transparent',
+            plotBorderWidth: 1,
+            plotBorderColor: '#475569',
             zooming: {
-                type: 'xy'      
+                type: 'xy'
             }
         },
         title: {
-            text: 'Best Placement vs Number of Songs'
+            text: 'Average Placement vs Number of Songs'
         },
         xAxis: {
             title: {
                 text: 'Number of Songs Written'
             },
             min: 0,
-            startOnTick: true,
-            endOnTick: true,
-            showLastLabel: true
+            gridLineWidth: 1
         },
         yAxis: {
             title: {
-                text: 'Best Placement (Lower is Better)'
+                text: 'Average Placement (Lower is Better)'
             },
             reversed: true,
-            min: 0,
-            max: 5
+            min: 1,
+            max: 25,
+            gridLineWidth: 1
         },
         legend: {
             enabled: false
         },
         plotOptions: {
-            scatter: {
-                marker: {
-                    radius: 5,
-                    symbol: 'circle',
-                    states: {
-                        hover: {
-                            enabled: true,
-                            lineColor: themeColors.primary
-                        }
-                    }
-                },
-                states: {
-                    hover: {
-                        enabled: true,
-                    }
-                },
-                tooltip: {
-                    headerFormat: '<b>{point.key}</b><br>',
-                    pointFormat: 'Songs: {point.x}<br>Best Place: {point.y}<br><em>Click to see songs</em>'
-                },
+            bubble: {
+                minSize: 20,
+                maxSize: 60,
                 cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '{point.name}',
+                    style: {
+                        fontSize: '10px',
+                        textOutline: '1px #1e293b',
+                        color: '#e2e8f0'
+                    }
+                },
                 point: {
                     events: {
                         click: function(this: any) {
@@ -425,41 +491,56 @@ const SongwriterHighchartsDashboard: React.FC = () => {
                 }
             }
         },
+        tooltip: {
+            formatter: function(this: any) {
+                return `<b>${this.point.name}</b><br/>
+                        Songs: ${this.x}<br/>
+                        Avg Place: ${this.y.toFixed(1)}<br/>
+                        Wins: ${this.point.wins}<br/>
+                        <em>Click to see songs</em>`;
+            }
+        },
         credits: {
             enabled: false
         },
         series: [{
-            name: 'Songwriters',
-            data: topBySongCount.map((w: SongwriterStats) => ({
+            type: 'bubble',
+            data: songwriters.filter((w: SongwriterStats) => w.songCount >= 8).map((w: SongwriterStats, index: number) => ({
                 x: w.songCount,
-                y: w.bestPlace,
-                name: w.name
+                y: parseFloat(w.avgPlace.toFixed(1)),
+                z: w.wins + 1,
+                name: w.name,
+                wins: w.wins,
+                color: w.wins > 0 ? chartColors[1] : chartColors[0]
             }))
-        } as any]
+        }]
     };
 
     const winsChartOptions: Highcharts.Options = {
         chart: {
-            type: 'pie'
+            type: 'pie',
+            backgroundColor: 'transparent'
         },
         title: {
-            text: 'Top 5 Songwriters by Wins'
+            text: 'Top Songwriters by Wins'
         },
         tooltip: {
             pointFormat: '{series.name}: <b>{point.y} wins</b><br/>Songs Written: <b>{point.songCount}</b><br/><em>Click to see songs</em>'
-        },
-        accessibility: {
-            point: {
-                valueSuffix: ' wins'
-            }
         },
         plotOptions: {
             pie: {
                 allowPointSelect: true,
                 cursor: 'pointer',
+                innerSize: '30%',
+                borderWidth: 0,
                 dataLabels: {
                     enabled: true,
-                    format: '<b>{point.name}</b>: {point.y} wins'
+                    format: '<b>{point.name}</b>: {point.y} wins',
+                    distance: 15,
+                    style: {
+                        color: '#e2e8f0',
+                        textOutline: '1px #1e293b'
+                    }
                 },
                 point: {
                     events: {
@@ -488,8 +569,10 @@ const SongwriterHighchartsDashboard: React.FC = () => {
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center h-96">
-                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-r-2 border-b-6 border-gray-800"></div>
+            <div className="container pb-10 m-auto max-w-7xl">
+                <div className="flex items-center justify-center h-44">
+                    <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-r-2 border-b-6 border-slate-400"></div>
+                </div>
             </div>
         );
     }
@@ -497,240 +580,278 @@ const SongwriterHighchartsDashboard: React.FC = () => {
     const SortIcon = ({ column }: { column: SortKey }) => {
         if (sortKey !== column) {
             return (
-                <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                <svg className="w-3 h-3 ms-1.5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z" />
                 </svg>
             );
         }
-        return sortDirection === 'asc' ? (
-            <svg className="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-            </svg>
-        ) : (
-            <svg className="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        return (
+            <svg className={`w-3 h-3 ms-1.5 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z" />
             </svg>
         );
     };
 
     return (
-        <div className="bg-slate-200 min-h-screen">
-            <div className="container mx-auto max-w-7xl px-5 py-8">
+        <div className="min-h-screen bg-slate-800">
+            <div className="container pb-10 m-auto max-w-7xl px-4">
+                <div className="mb-8 w-full mt-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        {/* Top songwriters by song count */}
+                        <div className="bg-slate-700 rounded-lg shadow-md p-6 border border-slate-700">
+                            <div className="h-[400px]">
+                                <HighchartsReact
+                                    highcharts={Highcharts}
+                                    options={songCountChartOptions}
+                                />
+                            </div>
+                        </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                    {/* Top songwriters by song count */}
-                    <div className="bg-slate-50 rounded-lg shadow-md p-4 border border-slate-300">
-                        <HighchartsReact
-                            highcharts={Highcharts}
-                            options={songCountChartOptions}
-                        />
+                        {/* Multi-line placement statistics */}
+                        <div className="bg-slate-700 rounded-lg shadow-md p-6 border border-slate-700">
+                            <div className="h-[400px]">
+                                <HighchartsReact
+                                    highcharts={Highcharts}
+                                    options={placementStatsChartOptions}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Avg placement bubble chart */}
+                        <div className="bg-slate-700 rounded-lg shadow-md p-6 border border-slate-700">
+                            <div className="h-[400px]">
+                                <HighchartsReact
+                                    highcharts={Highcharts}
+                                    options={avgPlacementBubbleChartOptions}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Top by wins donut */}
+                        <div className="bg-slate-700 rounded-lg shadow-md p-6 border border-slate-700">
+                            <div className="h-[400px]">
+                                <HighchartsReact
+                                    highcharts={Highcharts}
+                                    options={winsChartOptions}
+                                />
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Average placement */}
-                    <div className="bg-slate-50 rounded-lg shadow-md p-4 border border-slate-300">
-                        <HighchartsReact
-                            highcharts={Highcharts}
-                            options={avgPlaceChartOptions}
-                        />
-                    </div>
-
-                    {/* Best placement scatter */}
-                    <div className="bg-slate-50 rounded-lg shadow-md p-4 border border-slate-300">
-                        <HighchartsReact
-                            highcharts={Highcharts}
-                            options={bestPlaceChartOptions}
-                        />
-                    </div>
-
-                    {/* Top 3 by wins */}
-                    <div className="bg-slate-50 rounded-lg shadow-md p-4 border border-slate-300">
-                        <HighchartsReact
-                            highcharts={Highcharts}
-                            options={winsChartOptions}
-                        />
+                    {/* Statistics Summary */}
+                    <div className="bg-slate-700 rounded-lg shadow-md p-6 border border-slate-700">
+                        <h2 className="text-xl font-bold mb-4 text-slate-200">Quick Statistics</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="bg-slate-600 rounded-lg p-4">
+                                <h3 className="font-semibold text-slate-300">Total Songwriters</h3>
+                                <p className="text-2xl font-bold text-slate-100">{songwriters.length}</p>
+                            </div>
+                            <div className="bg-slate-600 rounded-lg p-4">
+                                <h3 className="font-semibold text-slate-300">Writers with Wins</h3>
+                                <p className="text-2xl font-bold text-slate-100">{songwriters.filter((w: SongwriterStats) => w.wins > 0).length}</p>
+                            </div>
+                            <div className="bg-slate-700 rounded-lg p-4">
+                                <h3 className="font-semibold text-slate-300">Writers with 5+ Songs</h3>
+                                <p className="text-2xl font-bold text-slate-100">{songwriters.filter((w: SongwriterStats) => w.songCount >= 5).length}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* Statistics Summary */}
-                <div className="bg-slate-100 rounded-lg p-6 border border-slate-300">
-                    <h2 className="text-xl font-bold mb-4 text-slate-800">Quick Statistics</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="bg-slate-50 rounded p-4 border border-slate-200">
-                            <h3 className="font-semibold text-slate-600">Total Songwriters</h3>
-                            <p className="text-2xl font-bold text-slate-800">{songwriters.length}</p>
-                        </div>
-                        <div className="bg-slate-50 rounded p-4 border border-slate-200">
-                            <h3 className="font-semibold text-slate-600">Writers with Wins</h3>
-                            <p className="text-2xl font-bold text-slate-800">{songwriters.filter((w: SongwriterStats) => w.wins > 0).length}</p>
-                        </div>
-                        <div className="bg-slate-50 rounded p-4 border border-slate-200">
-                            <h3 className="font-semibold text-slate-600">Writers with 5+ Songs</h3>
-                            <p className="text-2xl font-bold text-slate-800">{songwriters.filter((w: SongwriterStats) => w.songCount >= 5).length}</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Song Details Modal/Table */}
-                {showSongTable && selectedSongwriter && (
+                {/* Song Details Modal with animations */}
+                {showSongTable && (
                     <div 
-                        className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
-                        onClick={() => {
-                            setShowSongTable(false);
-                            setSelectedSongwriter(null);
-                        }}
+                        className={`fixed inset-0 z-50 overflow-y-auto transition-all duration-300 ${
+                            showSongTable ? 'opacity-100' : 'opacity-0'
+                        }`}
                     >
+                        {/* Backdrop */}
                         <div 
-                            className="relative top-10 mx-auto p-5 border w-11/12 max-w-6xl max-h-[90vh] shadow-lg rounded-md bg-white overflow-hidden flex flex-col"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <div className="flex justify-between items-center mb-4 px-2">
-                                <h3 className="text-lg font-bold text-gray-900">
-                                    Songs by {selectedSongwriter.name}
-                                </h3>
-                                <button
-                                    onClick={() => {
-                                        setShowSongTable(false);
-                                        setSelectedSongwriter(null);
-                                    }}
-                                    className="text-gray-400 hover:text-gray-600"
-                                >
-                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            </div>
+                            className={`fixed inset-0 bg-black transition-opacity duration-300 ${
+                                showSongTable ? 'bg-opacity-50' : 'bg-opacity-0'
+                            }`}
+                            onClick={() => {
+                                setShowSongTable(false);
+                                setSelectedSongwriter(null);
+                            }}
+                        />
+                        
+                        {/* Modal */}
+                        <div className="flex min-h-full items-center justify-center p-4">
+                            <div 
+                                className={`relative w-full max-w-6xl max-h-[90vh] bg-slate-800 rounded-lg shadow-xl transform transition-all duration-300 ${
+                                    showSongTable ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+                                }`}
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <div className="flex flex-col h-full max-h-[90vh]">
+                                    {/* Header */}
+                                    <div className="flex items-center justify-between p-6 border-b border-slate-700 bg-slate-700">
+                                        <h3 className="text-lg font-semibold text-slate-200">
+                                            Songs by {selectedSongwriter?.name}
+                                        </h3>
+                                        <button
+                                            onClick={() => {
+                                                setShowSongTable(false);
+                                                setSelectedSongwriter(null);
+                                            }}
+                                            className="rounded-full p-1 hover:bg-slate-600 transition-colors"
+                                        >
+                                            <svg className="h-5 w-5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
 
-                            {/* Songs Table - Scrollable area */}
-                            <div className="overflow-auto flex-1">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-slate-100 sticky top-0">
-                                        <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Thumbnail
-                                            </th>
-                                            <th 
-                                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-slate-200"
-                                                onClick={() => handleSort('song')}
-                                            >
-                                                <div className="flex items-center space-x-1">
-                                                    <span>Song</span>
-                                                    <SortIcon column="song" />
-                                                </div>
-                                            </th>
-                                            <th 
-                                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-slate-200"
-                                                onClick={() => handleSort('artist')}
-                                            >
-                                                <div className="flex items-center space-x-1">
-                                                    <span>Artist</span>
-                                                    <SortIcon column="artist" />
-                                                </div>
-                                            </th>
-                                            <th 
-                                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-slate-200"
-                                                onClick={() => handleSort('country')}
-                                            >
-                                                <div className="flex items-center space-x-1">
-                                                    <span>Country</span>
-                                                    <SortIcon column="country" />
-                                                </div>
-                                            </th>
-                                            <th 
-                                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-slate-200"
-                                                onClick={() => handleSort('year')}
-                                            >
-                                                <div className="flex items-center space-x-1">
-                                                    <span>Year</span>
-                                                    <SortIcon column="year" />
-                                                </div>
-                                            </th>
-                                            <th 
-                                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-slate-200"
-                                                onClick={() => handleSort('place')}
-                                            >
-                                                <div className="flex items-center space-x-1">
-                                                    <span>Place</span>
-                                                    <SortIcon column="place" />
-                                                </div>
-                                            </th>
-                                            <th 
-                                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-slate-200"
-                                                onClick={() => handleSort('points')}
-                                            >
-                                                <div className="flex items-center space-x-1">
-                                                    <span>Points</span>
-                                                    <SortIcon column="points" />
-                                                </div>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
-                                        {sortedSongs.map((song) => (
-                                            <tr key={song.id} className="hover:bg-slate-50">
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    {song.youtubeUrl ? (
-                                                        <a
-                                                            href={`https://www.youtube.com/watch?v=${song.youtubeUrl}`}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="block"
-                                                        >
-                                                            <img
-                                                                src={getYouTubeThumbnailUrl(song.youtubeUrl) || '/placeholder.png'}
-                                                                alt={`${song.name} thumbnail`}
-                                                                className="h-16 w-24 object-cover rounded hover:opacity-80 transition-opacity"
-                                                            />
-                                                        </a>
-                                                    ) : (
-                                                        <div className="h-16 w-24 bg-slate-200 rounded flex items-center justify-center text-slate-400 text-xs">
-                                                            No video
+                                    {/* Table Content */}
+                                    <div className="flex-1 overflow-auto">
+                                        <table className="min-w-full divide-y divide-slate-700">
+                                            <thead className="bg-slate-600 sticky top-0">
+                                                <tr>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                                        Thumbnail
+                                                    </th>
+                                                    <th 
+                                                        className={`px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-slate-700 ${
+                                                            sortKey === 'song' ? 'font-bold' : ''
+                                                        }`}
+                                                        onClick={() => handleSort('song')}
+                                                    >
+                                                        <div className="flex items-center">
+                                                            <span>Song</span>
+                                                            <SortIcon column="song" />
                                                         </div>
-                                                    )}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm font-medium text-gray-900">{song.name}</div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm text-gray-900">{song.artist?.name || 'N/A'}</div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm text-gray-900">{song.country?.name || 'N/A'}</div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm text-gray-900">{song.year?.year || 'N/A'}</div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                                        ${song.finalPlace?.place === 1 ? 'bg-yellow-100 text-yellow-800' : 
-                                                          song.finalPlace?.place && song.finalPlace.place <= 3 ? 'bg-slate-100 text-slate-800' :
-                                                          song.finalPlace?.place && song.finalPlace.place <= 10 ? 'bg-slate-50 text-slate-700' :
-                                                          'bg-gray-100 text-gray-800'}`}>
-                                                        {song.finalPlace?.place || 'N/A'}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm text-gray-900">{song.totalPoints || 'N/A'}</div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                                                    </th>
+                                                    <th 
+                                                        className={`px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-slate-700 ${
+                                                            sortKey === 'artist' ? 'font-bold' : ''
+                                                        }`}
+                                                        onClick={() => handleSort('artist')}
+                                                    >
+                                                        <div className="flex items-center">
+                                                            <span>Artist</span>
+                                                            <SortIcon column="artist" />
+                                                        </div>
+                                                    </th>
+                                                    <th 
+                                                        className={`px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-slate-700 ${
+                                                            sortKey === 'country' ? 'font-bold' : ''
+                                                        }`}
+                                                        onClick={() => handleSort('country')}
+                                                    >
+                                                        <div className="flex items-center">
+                                                            <span>Country</span>
+                                                            <SortIcon column="country" />
+                                                        </div>
+                                                    </th>
+                                                    <th 
+                                                        className={`px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-slate-700 ${
+                                                            sortKey === 'year' ? 'font-bold' : ''
+                                                        }`}
+                                                        onClick={() => handleSort('year')}
+                                                    >
+                                                        <div className="flex items-center">
+                                                            <span>Year</span>
+                                                            <SortIcon column="year" />
+                                                        </div>
+                                                    </th>
+                                                    <th 
+                                                        className={`px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-slate-700 ${
+                                                            sortKey === 'place' ? 'font-bold' : ''
+                                                        }`}
+                                                        onClick={() => handleSort('place')}
+                                                    >
+                                                        <div className="flex items-center">
+                                                            <span>Final Place</span>
+                                                            <SortIcon column="place" />
+                                                        </div>
+                                                    </th>
+                                                    <th 
+                                                        className={`px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-slate-700 ${
+                                                            sortKey === 'points' ? 'font-bold' : ''
+                                                        }`}
+                                                        onClick={() => handleSort('points')}
+                                                    >
+                                                        <div className="flex items-center">
+                                                            <span>Total Points</span>
+                                                            <SortIcon column="points" />
+                                                        </div>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-stone-400">
+                                                {sortedSongs.map((song, index) => (
+                                                    <tr key={song.id} className={`${index % 2 === 0 ? 'bg-[#909fb3]' : 'bg-[#828fa2]'} text-white font-medium`}>
+                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                            {song.youtubeUrl ? (
+                                                                <a
+                                                                    href={`https://www.youtube.com/watch?v=${song.youtubeUrl}`}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="block"
+                                                                >
+                                                                    <img
+                                                                        src={getYouTubeThumbnailUrl(song.youtubeUrl) || '/placeholder.png'}
+                                                                        alt={`${song.name} thumbnail`}
+                                                                        className="h-16 w-24 object-cover rounded hover:opacity-80 transition-opacity"
+                                                                    />
+                                                                </a>
+                                                            ) : (
+                                                                <div className="h-16 w-24 bg-slate-600 rounded flex items-center justify-center text-gray-400 text-xs">
+                                                                    No video
+                                                                </div>
+                                                            )}
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                            <div className="text-sm font-medium">{song.name}</div>
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                            <div className="text-sm">{song.artist?.name || 'N/A'}</div>
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                            <div className="text-sm">{song.country?.name || 'N/A'}</div>
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                            <div className="text-sm">{song.year?.year || 'N/A'}</div>
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                                                ${song.finalPlace?.place === 1 ? 'bg-yellow-600 text-white' : 
+                                                                  song.finalPlace?.place && song.finalPlace.place <= 3 ? 'bg-green-700 text-white' :
+                                                                  song.finalPlace?.place && song.finalPlace.place <= 10 ? 'bg-blue-700 text-white' :
+                                                                  'bg-gray-600 text-gray-200'}`}>
+                                                                {song.finalPlace?.place || 'N/A'}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                            <div className="text-sm">{song.totalPoints || 'N/A'}</div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
 
-                            {/* Summary Stats - Fixed at bottom */}
-                            <div className="mt-4 pt-4 border-t border-gray-200 bg-white">
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                                    <div>
-                                        <span className="font-semibold">Total Songs:</span> {selectedSongwriter.songCount}
-                                    </div>
-                                    <div>
-                                        <span className="font-semibold">Wins:</span> {selectedSongwriter.wins}
-                                    </div>
-                                    <div>
-                                        <span className="font-semibold">Top 10s:</span> {selectedSongwriter.topTens}
-                                    </div>
-                                    <div>
-                                        <span className="font-semibold">Avg Place:</span> {selectedSongwriter.avgPlace.toFixed(1)}
+                                    {/* Footer Summary */}
+                                    <div className="p-6 border-t border-slate-700 bg-slate-700">
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                            <div>
+                                                <span className="font-semibold text-slate-300">Total Songs:</span>
+                                                <span className="ml-2 text-slate-100 font-bold">{selectedSongwriter?.songCount}</span>
+                                            </div>
+                                            <div>
+                                                <span className="font-semibold text-slate-300">Wins:</span>
+                                                <span className="ml-2 text-slate-100 font-bold">{selectedSongwriter?.wins}</span>
+                                            </div>
+                                            <div>
+                                                <span className="font-semibold text-slate-300">Top 10s:</span>
+                                                <span className="ml-2 text-slate-100 font-bold">{selectedSongwriter?.topTens}</span>
+                                            </div>
+                                            <div>
+                                                <span className="font-semibold text-slate-300">Avg Place:</span>
+                                                <span className="ml-2 text-slate-100 font-bold">{selectedSongwriter?.avgPlace.toFixed(1)}</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

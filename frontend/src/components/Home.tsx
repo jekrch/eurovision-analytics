@@ -19,7 +19,7 @@ const Home: React.FC = () => {
   ];
 
   return (
-    <div className="bg-slate-200 min-h-[100vh] min-w-[100vw] max-w-[100vw] ">
+    <div className="bg-slate-800 min-h-[100vh] min-w-[100vw] max-w-[100vw] ">
       <Navbar 
         items={navItems} 
         handleTabChange={handleTabChange}
