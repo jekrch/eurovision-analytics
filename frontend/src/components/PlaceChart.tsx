@@ -5,9 +5,9 @@ import CountryDropdown from './CountryDropdown';
 import SongTable from './SongTable';
 import LineChart from './Chart';
 import { songTooltipHandler } from '../utils/TooltipUtils';
-import { Song } from '../models/Song';
 import { Country } from '../models/Country';
 import Header from './Header';
+import { Song } from '../models/Song';
 
 Chart.register(...registerables);
 
@@ -63,18 +63,28 @@ const PlaceChart: React.FC = () => {
                         query {
                             songs(where: { country: { name: "${selectedCountry}" }, finalPlace: { place_NOT: null } }) {
                                 id
-                                name
-                                year { year }
-                                artist { name }
-                                finalPlace { place }
-                                totalPoints
+                                    name
+                                    youtubeUrl
+                                    totalPoints
+                                    finalPlace {
+                                        place
+                                    }
+                                    country {
+                                        name
+                                    }
+                                    year {
+                                        year
+                                    }
+                                    artist {
+                                        name
+                                    }
                             }
                         }
                     `,
                 }),
             });
             const data = await response.json();
-            const sortedSongs = data.data.songs.sort((a: Song, b: Song) => a.year.year - b.year.year);
+            const sortedSongs = data.data.songs.sort((a: Song, b: Song) => a.year?.year! - b.year?.year!);
             setSongs(sortedSongs);
         };
 
@@ -100,12 +110,12 @@ const PlaceChart: React.FC = () => {
                 label: 'Final Place',
                 data: Array.from({ length: maxYear - minYear + 1 }, (_, i) => {
                     const year = minYear + i;
-                    const song = songs.find((song) => song.year.year === year);
-                    return song ? song.finalPlace.place : null;
+                    const song = songs.find((song) => song.year.year! === year);
+                    return song ? song.finalPlace!.place! : null;
                 }),
                 meta: Array.from({ length: maxYear - minYear + 1 }, (_, i) => {
                     const year = minYear + i;
-                    const song = songs.find((song) => song.year.year === year);
+                    const song = songs.find((song) => song.year.year! === year);
                     return song || null;
                 }),
                 fill: false,
@@ -219,7 +229,7 @@ const PlaceChart: React.FC = () => {
             </div>
 
             <div className="max-w-[90vw] m-auto  relative overflow-x-auto shadow-md sm:rounded-lg mt-8">
-                <SongTable songs={songs} />
+                <SongTable songs={songs} className="max-h-[50em]" />
             </div>
         </div>
     );

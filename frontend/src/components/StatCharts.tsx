@@ -1,9 +1,9 @@
 import React from 'react';
 import RunningOrderChart from './RunningOrderChart';
-import LanguageChart from './LanguageChart';
 import Header from './Header';
-import SongwriterHighchartsDashboard from './SongwriterHighchartsDashboard';
+import SongwriterDashboard from './SongwriterDashboard';
 import PlaceChart from './PlaceChart';
+import LanguageDashboard from './LanguageDashboard';
 
 const StatCharts: React.FC = () => {
   return (
@@ -18,7 +18,7 @@ const StatCharts: React.FC = () => {
       <Header
         title={'Most Prolific Songwriters'}
       />
-      <SongwriterHighchartsDashboard />
+      <SongwriterDashboard />
 
       <Header
         title={'Average Final Place by Final Running Order'}
@@ -27,7 +27,7 @@ const StatCharts: React.FC = () => {
       <Header
         title={'Language Distribution'}
       />
-      <LanguageChart />
+      <LanguageDashboard />
     </div>
   );
 };

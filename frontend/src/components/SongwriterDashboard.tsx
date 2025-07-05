@@ -2,25 +2,8 @@ import React, { useEffect, useState } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import 'highcharts/highcharts-more';
+import { Song } from '../models/Song';
 
-interface Song {
-    id: string;
-    name: string;
-    youtubeUrl: string | null;
-    finalPlace?: {
-        place: number;
-    };
-    country?: {
-        name: string;
-    };
-    year?: {
-        year: number;
-    };
-    artist?: {
-        name: string;
-    };
-    totalPoints?: number;
-}
 
 interface SongwriterStats {
     name: string;
@@ -44,7 +27,7 @@ const getYouTubeThumbnailUrl = (videoId: string | null): string | null => {
     return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 };
 
-const SongwriterHighchartsDashboard: React.FC = () => {
+const SongwriterDashboard: React.FC = () => {
     const [songwriters, setSongwriters] = useState<SongwriterStats[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedSongwriter, setSelectedSongwriter] = useState<SongwriterStats | null>(null);
@@ -863,4 +846,4 @@ const SongwriterHighchartsDashboard: React.FC = () => {
     );
 };
 
-export default SongwriterHighchartsDashboard;
+export default SongwriterDashboard;

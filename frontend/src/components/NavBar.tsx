@@ -54,7 +54,7 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
             <span className="text-slate-300 text-xl font-bold font-sans tracking-tighter">
               Eurovision Analytics
             </span>
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <div className="ml-10 flex items-baseline space-x-4">
                 {props.items.map((item) => (
                   <button
