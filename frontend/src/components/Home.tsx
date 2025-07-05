@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import PlaceChart from './PlaceChart';
 import Navbar from './NavBar';
 import StatCharts from './StatCharts';
-import Header from './Header';
 
 const Home: React.FC = () => {
   const [activeTab, setActiveTab] = useState('placeChart');
@@ -12,8 +10,8 @@ const Home: React.FC = () => {
   };
 
   const navItems = [
-    { label: 'Placement By Country', path: 'placeChart' },
-    { label: 'Stat Charts', path: 'runningOrderChart' },
+    { label: 'stats', path: 'placeChart' },
+    // { label: 'Stat Charts', path: 'runningOrderChart' },
     { label: 'Neo4J', url: 'http://localhost:7474' },
     { label: 'GraphQL', url: 'http://localhost:4000' },
   ];
@@ -26,19 +24,10 @@ const Home: React.FC = () => {
       />
       
       <div className="mx-10 items-center justify-center flex flex-col">
-        
-        {
-          activeTab === 'placeChart' ? 
-          <>
-            <Header 
-                title={'Grand Final Results By Country'}
-                className="mt-4"
-            />
-            
-            <PlaceChart /> 
-          </>: 
+
+
           <StatCharts/>
-        } 
+        
       
       </div>
     </div>

@@ -658,7 +658,7 @@ const SongwriterHighchartsDashboard: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Song Details Modal with animations */}
+                {/* Song Details Modal */}
                 {showSongTable && (
                     <div 
                         className={`fixed inset-0 z-50 overflow-y-auto transition-all duration-300 ${
@@ -679,14 +679,14 @@ const SongwriterHighchartsDashboard: React.FC = () => {
                         {/* Modal */}
                         <div className="flex min-h-full items-center justify-center p-4">
                             <div 
-                                className={`relative w-full max-w-6xl max-h-[90vh] bg-slate-800 rounded-lg shadow-xl transform transition-all duration-300 ${
+                                className={`relative w-full max-w-6xl max-h-[90vh] bg-slate-800 shadow-xl transform transition-all duration-300 ${
                                     showSongTable ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
                                 }`}
                                 onClick={(e) => e.stopPropagation()}
                             >
-                                <div className="flex flex-col h-full max-h-[90vh]">
+                                <div className="flex flex-col h-full max-h-[90vh] ">
                                     {/* Header */}
-                                    <div className="flex items-center justify-between p-6 border-b border-slate-700 bg-slate-700">
+                                    <div className="rounded-lg flex items-center justify-between p-6 border-b border-slate-700 bg-slate-700">
                                         <h3 className="text-lg font-semibold text-slate-200">
                                             Songs by {selectedSongwriter?.name}
                                         </h3>
@@ -781,7 +781,7 @@ const SongwriterHighchartsDashboard: React.FC = () => {
                                             </thead>
                                             <tbody className="divide-y divide-stone-400">
                                                 {sortedSongs.map((song, index) => (
-                                                    <tr key={song.id} className={`${index % 2 === 0 ? 'bg-[#909fb3]' : 'bg-[#828fa2]'} text-white font-medium`}>
+                                                    <tr key={song.id} className={`${index % 2 === 0 ? 'bg-slate-500' : 'bg-slate-500/80'} text-white font-medium`}>
                                                         <td className="px-6 py-4 whitespace-nowrap">
                                                             {song.youtubeUrl ? (
                                                                 <a
@@ -833,7 +833,7 @@ const SongwriterHighchartsDashboard: React.FC = () => {
                                     </div>
 
                                     {/* Footer Summary */}
-                                    <div className="p-6 border-t border-slate-700 bg-slate-700">
+                                    <div className="rounded-b-lg p-6 border-t border-slate-700 bg-slate-700">
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                                             <div>
                                                 <span className="font-semibold text-slate-300">Total Songs:</span>

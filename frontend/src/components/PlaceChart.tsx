@@ -219,7 +219,7 @@ const PlaceChart: React.FC = () => {
                 <LineChart data={chartData} options={chartOptions} />
             </div>
 
-            <div className="relative overflow-x-auto shadow-md sm:rounded-lg mt-8">
+            <div className="max-w-[90vw] m-auto  relative overflow-x-auto shadow-md sm:rounded-lg mt-8">
                 <SongTable songs={songs} />
             </div>
         </div>

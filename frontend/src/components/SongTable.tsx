@@ -192,7 +192,7 @@ const SongTable: React.FC<SongTableProps> = ({ songs }) => {
         </thead>
         <tbody>
           {sortedSongs.map((song, index) => (
-            <tr key={song.id} className={`border-b border-b-stone-400 text-white font-medium ${index % 2 === 0 ? 'bg-[#909fb3]' : 'bg-[#828fa2]'}`}>
+            <tr key={song.id} className={`border-b border-b-stone-400 text-white font-medium ${index % 2 === 0 ? 'bg-slate-500' : 'bg-slate-500/80'}`}>
               <td className="px-6 py-4">{song.year.year}</td>
               <td className="px-6 py-4">{song.name}</td>
               <td className="px-6 py-4">{song.artist.name}</td>

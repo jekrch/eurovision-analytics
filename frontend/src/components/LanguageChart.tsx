@@ -59,43 +59,21 @@ const LanguageChart: React.FC = () => {
             {
                 data: data.map((item) => item.count),
                 backgroundColor: [
-                    // "#22a7f0", "#48b5c4", "#3c4e4b", "#98d1d1", "#dedad2", "#e4bcad", "#df979e", 
-                    // "#0d88e6",  "#d7658b", "#c80064", "#e27c7c", "#a86464", "#6d4b4b", "#503f3f", "#333333", 
-                    // "#badbdb", "#466964", "#599e94",  "#b30000", "#7c1158", "#4421af", 
-                    // "#1a53ff", "#00b7c7", "#5ad45a", "#8be04e", "#ebdc78", "#115f9a", 
-                    // "#1984c5", "#76c68f", "#c9e52f", "#d0ee11", 
-                    // "#d0f400"
-                    '#6495ED', // Cornflower Blue
-                    '#8E44AD', // Wisteria
-                    '#3D9970', // Olive
-                    '#FF4136', // Red
-                    '#0074D9', // Blue
-                    '#C44536', // Brick Red
-                    '#7FDBFF', // Electric Blue
-                    '#2ECC40', // Emerald
-                    '#FF6B6B', // Pastel Red
-                    '#4ECDC4', // Turquoise
-                    //'#FFE66D', // Pastel Yellow
-                    '#FF851B', // Orange
-                    '#B10DC9', // Purple
-                    '#01FF70', // Lime
-                    '#F012BE', // Fuchsia
-                    '#39CCCC', // Teal
-                    //'#FFDC00', // Golden Yellow
-                    '#85144B', // Maroon
-                    '#7BDCB5', // Aquamarine
-                    //'#F0E68C', // Khaki
-                    //'#FFFF00', // Yellow
-                    '#FF69B4', // Hot Pink
-                    '#00A8E8', // Cyan
-                    '#FF8C00', // Dark Orange
-                    '#BA55D3', // Medium Orchid
-                    '#66CC99', // Soft Green
-                    '#FFA07A', // Light Salmon
-                    '#9370DB', // Medium Purple
-                    '#00CED1', // Dark Turquoise
-                    '#FFC0CB',  // Pink
-                    "#22a7f0", "#48b5c4", "#3c4e4b", 
+                    '#75c8ae', // Mint/Teal
+                    '#e5771e', // Dark Orange
+                    '#f4a127', // Light Orange
+                    '#5a3d2b', // Dark Brown
+                    '#ffecb4', // Light Cream
+                    '#8ab5a3', // Lighter teal variant
+                    '#c9935f', // Mid orange-brown
+                    '#6d9987', // Darker teal variant
+                    '#d4a574', // Light brown
+                    '#4a7c68', // Deep teal
+                    '#b87333', // Copper
+                    '#9fc5b8', // Pale teal
+                    '#cd853f', // Peru
+                    '#5e8072', // Sage green
+                    '#daa520', // Goldenrod
                 ]
             },
         ],
@@ -129,19 +107,19 @@ const LanguageChart: React.FC = () => {
     };
 
     return (
-            <div className="container pb-10 m-auto max-w-[40em]">
-                <div className="mb-8 w-full mt-0">
-                    {isLoading ? (
-                        <div className="flex items-center justify-center h-44">
-                            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-r-2 border-b-6 border-gray-800"></div>
-                        </div>
-                    ) : (
-                        <div className="h-[900px] w-[75%] mx-auto mt-0">
-                            <Pie data={chartData} options={chartOptions} />
-                        </div>
-                    )}
-                </div>
+        <div className="container pb-10 m-auto max-w-[40em]">
+            <div className="mb-8 w-full mt-0">
+                {isLoading ? (
+                    <div className="flex items-center justify-center h-44">
+                        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-r-2 border-b-6 border-gray-800"></div>
+                    </div>
+                ) : (
+                    <div className="h-[900px] w-[75%] mx-auto mt-0">
+                        <Pie data={chartData} options={chartOptions} />
+                    </div>
+                )}
             </div>
+        </div>
     );
 };
 
