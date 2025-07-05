@@ -10,7 +10,7 @@ const Home: React.FC = () => {
   };
 
   const navItems = [
-    { label: 'stats', path: 'placeChart' },
+    { label: 'Stats', path: 'placeChart' },
     // { label: 'Stat Charts', path: 'runningOrderChart' },
     { label: 'Neo4J', url: 'http://localhost:7474' },
     { label: 'GraphQL', url: 'http://localhost:4000' },

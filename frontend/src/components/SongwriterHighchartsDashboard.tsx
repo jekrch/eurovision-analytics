@@ -471,13 +471,13 @@ const SongwriterHighchartsDashboard: React.FC = () => {
         plotOptions: {
             bubble: {
                 minSize: 20,
-                maxSize: 60,
+                maxSize: 80,
                 cursor: 'pointer',
                 dataLabels: {
                     enabled: true,
                     format: '{point.name}',
                     style: {
-                        fontSize: '10px',
+                        fontSize: '12px',
                         textOutline: '1px #1e293b',
                         color: '#e2e8f0'
                     }
@@ -650,7 +650,7 @@ const SongwriterHighchartsDashboard: React.FC = () => {
                                 <h3 className="font-semibold text-slate-300">Writers with Wins</h3>
                                 <p className="text-2xl font-bold text-slate-100">{songwriters.filter((w: SongwriterStats) => w.wins > 0).length}</p>
                             </div>
-                            <div className="bg-slate-700 rounded-lg p-4">
+                            <div className="bg-slate-600 rounded-lg p-4">
                                 <h3 className="font-semibold text-slate-300">Writers with 5+ Songs</h3>
                                 <p className="text-2xl font-bold text-slate-100">{songwriters.filter((w: SongwriterStats) => w.songCount >= 5).length}</p>
                             </div>

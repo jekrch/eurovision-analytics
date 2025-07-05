@@ -214,7 +214,6 @@ const PlaceChart: React.FC = () => {
                 />
             </div>
             
-            {/* Swapped to a darker background for better contrast and theme consistency */}
             <div className="max-w-[90vw] m-auto mt-[4em] p-4 bg-slate-600 rounded-lg shadow-lg">
                 <LineChart data={chartData} options={chartOptions} />
             </div>

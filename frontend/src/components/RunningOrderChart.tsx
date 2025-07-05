@@ -1,20 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart, ChartOptions, PointElement, Tick, registerables } from 'chart.js';
-import LineChart from './Chart';
-import { countTooltipHandler, songTooltipHandler } from '../utils/TooltipUtils';
-import Header from './Header';
+import LineChart from './Chart'; // Assuming LineChart is a local component
+import { countTooltipHandler } from '../utils/TooltipUtils'; // Assuming TooltipUtils is in this path
 
 Chart.register(...registerables);
 
 interface AverageFinalPlaceData {
     finalRunningOrder: number;
-    averageFinalPlace: number;
+    averageFinalPlace: number | null; // Allow null for cases with no data
 }
 
 const RunningOrderChart: React.FC = () => {
     const [data, setData] = useState<AverageFinalPlaceData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+
+    // Consistent color palette from PlaceChart
+    const colors = {
+        background: 'rgb(30, 41, 59)',      // slate-800
+        text: 'rgb(203, 213, 225)',         // slate-300
+        line: 'rgb(100, 116, 139)',         // slate-500
+        point: 'rgb(226, 232, 240)',        // slate-200
+        grid: 'rgb(51, 65, 85)',            // slate-700
+        firstPlace: '#FBBF24',              // amber-400 (not used here, but kept for consistency)
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -40,11 +49,17 @@ const RunningOrderChart: React.FC = () => {
             });
 
             const result = await response.json();
+            
+            // Ensure result.data and result.data.finalRunningOrders exist before processing
+            if (result.data && result.data.finalRunningOrders) {
+                const averageFinalPlaceData = calculateAveragePlacePerRunningOrder(result.data.finalRunningOrders);
+                setData(averageFinalPlaceData);
+            } else {
+                // Handle cases where data is not in the expected format
+                console.error("Fetched data is not in the expected format:", result);
+                setData([]);
+            }
 
-            const averageFinalPlaceData = calculateAveragePlacePerRunningOrder(result);
-
-            //await delay(4000);
-            setData(averageFinalPlaceData);
             setIsLoading(false);
         };
 
@@ -53,20 +68,19 @@ const RunningOrderChart: React.FC = () => {
 
     /**
      * For each finalRunningOrder, get the average final place and return data in array for chart
-     * @param result 
-     * @returns 
+     * @param finalRunningOrders The raw data from the GraphQL query.
+     * @returns An array of objects formatted for the chart.
      */
-    function calculateAveragePlacePerRunningOrder(result: any) {
-        const finalRunningOrders = result.data.finalRunningOrders;
-
-        const averageFinalPlaceData = finalRunningOrders.map((finalRunningOrder: any) => {
+    function calculateAveragePlacePerRunningOrder(finalRunningOrders: any[]): AverageFinalPlaceData[] {
+        return finalRunningOrders.map((finalRunningOrder: any) => {
             const { order, songs } = finalRunningOrder;
-            const totalFinalPlace = songs.reduce((sum: any, song: any) => sum + song.finalPlace.place, 0);
-            const averageFinalPlace = songs.length > 0 ? Math.round((totalFinalPlace / songs.length) * 10) / 10 : null;
+            if (!songs || songs.length === 0) {
+                return { finalRunningOrder: order, averageFinalPlace: null };
+            }
+            const totalFinalPlace = songs.reduce((sum: number, song: any) => sum + (song.finalPlace?.place || 0), 0);
+            const averageFinalPlace = Math.round((totalFinalPlace / songs.length) * 10) / 10;
             return { finalRunningOrder: order, averageFinalPlace };
         });
-
-        return averageFinalPlaceData;
     }
 
     const chartData = {
@@ -76,14 +90,14 @@ const RunningOrderChart: React.FC = () => {
                 label: 'Average Final Place',
                 data: data.map((item) => item.averageFinalPlace),
                 fill: false,
-                borderColor: 'rgb(118 163 184)',
-                tension: 0.03,
+                borderColor: colors.line, 
+                tension: 0.1,
                 spanGaps: true,
                 pointHitRadius: 20,
                 pointRadius: 4,
                 pointHoverRadius: 10,
-                pointBackgroundColor: 'rgb(118 163 184)',
-                pointBorderColor: 'rgb(118 163 184)',
+                pointBackgroundColor: colors.point, 
+                pointBorderColor: colors.point, 
                 pointStyle: 'circle',
             },
         ],
@@ -97,49 +111,67 @@ const RunningOrderChart: React.FC = () => {
                 position: 'nearest',
                 external: countTooltipHandler,
             },
+            legend: {
+                labels: {
+                    color: colors.text, 
+                },
+            },
         },
         scales: {
             x: {
                 title: {
                     display: true,
                     text: 'Final Running Order',
+                    color: colors.text, 
+                },
+                grid: {
+                    color: colors.grid, 
+                },
+                ticks: {
+                    color: colors.text, 
                 },
             },
             y: {
                 reverse: true,
-                min: 0,
-                max: Math.max(...data.map((item) => item.averageFinalPlace || 0)) + 2,
+                min: data.length > 0 ? Math.min(...data.map(item => item.averageFinalPlace || 20)) - 2 : 0,
+                max: data.length > 0 ? Math.max(...data.map(item => item.averageFinalPlace || 0)) + 2 : 26,
                 ticks: {
-                    stepSize: 1,
+                    color: colors.text, 
+                    stepSize: 2,
                     callback: (value: number | string) => {
                         if (typeof value === 'number' && Number.isInteger(value) && value >= 1) {
                             return `${value}${value === 1 ? 'st' : value === 2 ? 'nd' : value === 3 ? 'rd' : 'th'}`;
                         }
-                        return '';
+                        // Return an empty string for non-integer or zero values to avoid clutter
+                        return Number.isInteger(value) && value as number > 0 ? value : '';
                     },
+                },
+                grid: {
+                    color: colors.grid, 
                 },
                 title: {
                     display: true,
                     text: 'Average Final Place',
+                    color: colors.text,
                 },
             },
         },
     };
 
     return (
-        <div className="container marker:mt-4 m-auto max-w-[40em] px-5">
-
-            <div className="mb-8">
-                {isLoading ? (
-                    <div className="flex items-center justify-center h-44">
-                        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-r-2 border-b-6 border-gray-800"></div>
-                    </div>
-                ) : (
-                    <div className="mb-8 min-w-full mt-[2em]">
-                        <LineChart data={chartData} options={chartOptions} />
-                    </div>
-                )}
-            </div>
+        // Using a darker background for the chart container for consistency with PlaceChart
+        <div className="container marker:mt-4 max-w-[90vw] m-auto mt-[2em] mb-[2em] p-4 bg-slate-600 rounded-lg shadow-lg">
+            {isLoading ? (
+                <div className="flex items-center justify-center h-[400px]">
+                    {/* Updated spinner color to be more visible on the dark background */}
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-slate-300"></div>
+                </div>
+            ) : (
+                // Set a specific height for the chart container
+                <div className="h-[400px] w-full mt-[2em]">
+                    <LineChart data={chartData} options={chartOptions} />
+                </div>
+            )}
         </div>
     );
 };
