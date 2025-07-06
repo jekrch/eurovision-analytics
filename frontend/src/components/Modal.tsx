@@ -19,16 +19,25 @@ const Modal: React.FC<ModalProps> = ({
 }) => {
     // This state controls the mounting/unmounting with a delay for animations.
     const [isRendered, setIsRendered] = useState(false);
+    // This state controls the animation classes
+    const [isAnimating, setIsAnimating] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
             setIsRendered(true);
+            // Small delay to ensure the element is mounted before starting animation
+            const timer = setTimeout(() => {
+                setIsAnimating(true);
+            }, 10);
+            return () => clearTimeout(timer);
+        } else {
+            setIsAnimating(false);
         }
     }, [isOpen]);
 
     const handleAnimationEnd = () => {
-        // When the fade-out animation ends (isRendered is false), call the parent's onClose.
-        if (!isOpen) {
+        // When the fade-out animation ends, unmount the component
+        if (!isOpen && !isAnimating) {
             setIsRendered(false);
         }
     };
@@ -49,17 +58,6 @@ const Modal: React.FC<ModalProps> = ({
         return () => document.removeEventListener('keydown', handleEscape);
     }, [handleClose]);
 
-    useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'unset';
-        }
-        return () => {
-            document.body.style.overflow = 'unset';
-        };
-    }, [isOpen]);
-
     // Render the component only if `isRendered` is true.
     if (!isRendered) {
         return null;
@@ -75,21 +73,21 @@ const Modal: React.FC<ModalProps> = ({
             {/* Backdrop with fade effect */}
             <div
                 className={`fixed inset-0 bg-black transition-opacity duration-300 ease-in-out ${
-                    isOpen ? 'bg-opacity-50' : 'bg-opacity-0'
+                    isAnimating ? 'bg-opacity-50' : 'bg-opacity-0'
                 }`}
                 onClick={handleClose}
             />
             
             {/* Modal content with fade and scale effect */}
             <div
-                className={`relative w-full ${maxWidth} max-h-[90vh] bg-slate-800 shadow-xl rounded-lg flex flex-col transform transition-all duration-300 ease-in-out ${
-                    isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+                className={`relative w-full ${maxWidth} max-h-[90vh] bg-slate-700 shadow-xl rounded-lg flex flex-col transform transition-all duration-300 ease-in-out ${
+                    isAnimating ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
                 }`}
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
                 {title && (
-                    <div className="flex items-center justify-between p-6 border-b border-slate-700">
+                    <div className="flex items-center justify-between p-6 ">
                         <h3 className="text-lg font-semibold text-slate-200">{title}</h3>
                         <button
                             onClick={handleClose}
@@ -104,13 +102,13 @@ const Modal: React.FC<ModalProps> = ({
                 )}
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-6">
+                <div className="flex-1 overflow-y-auto p-6 pt-0">
                     {children}
                 </div>
 
                 {/* Footer */}
                 {footer && (
-                    <div className="p-6 border-t border-slate-700">
+                    <div className="p-6 pt-0">
                         {footer}
                     </div>
                 )}
@@ -118,5 +116,6 @@ const Modal: React.FC<ModalProps> = ({
         </div>
     );
 };
+
 
 export default Modal;

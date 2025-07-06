@@ -214,7 +214,7 @@ const PlaceChart: React.FC = () => {
     };
 
     return (
-        <div className="container marker:mt-4 mb-8 m-auto">
+        <div className="container marker:mt-4 mb-8 m-auto pb-6 max-w-7xl px-10">
             <div className="mb-4 mt-6 flex items-center justify-center">
                 <CountryDropdown
                     className="mb-4 absolute mt-14"
@@ -228,7 +228,7 @@ const PlaceChart: React.FC = () => {
                 <LineChart data={chartData} options={chartOptions} />
             </div>
 
-            <div className="max-w-[90vw] m-auto  relative overflow-x-auto shadow-md sm:rounded-lg mt-8">
+            <div className="max-w-[90vw] m-auto relative overflow-x-auto shadow-md sm:rounded-lg mt-8">
                 <SongTable songs={songs} className="max-h-[50em]" />
             </div>
         </div>

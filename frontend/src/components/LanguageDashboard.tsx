@@ -4,6 +4,7 @@ import HighchartsReact from 'highcharts-react-official';
 import 'highcharts/highcharts-more';
 import SongTableModal from './SongTableModal';
 import { Song } from '../models/Song';
+import classNames from 'classnames';
 
 interface LanguageData {
     name: string;
@@ -176,7 +177,6 @@ const LanguageDashboard: React.FC = () => {
 
     // Get top languages
     const topLanguages = data.slice(0, 10);
-    console.log('Top Languages:', topLanguages);
     const topByWins = data.filter(l => l.wins > 0).sort((a, b) => b.wins - a.wins).slice(0, 6);
 
     // Prepare data for yearly trends
@@ -452,12 +452,12 @@ const LanguageDashboard: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-slate-800">
-            <div className="container pb-10 m-auto max-w-7xl px-4">
+        <div className="min-h-screen ">
+            <div className="container pb-10 m-auto max-w-7xl px-10 ">
                 <div className="mb-8 w-full mt-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                         {/* Donut chart */}
-                        <div className="bg-slate-700 rounded-lg shadow-md p-6 border border-slate-700">
+                        <div className="bg-slate-600 rounded-lg shadow-md p-6 border border-slate-700">
                             <div className="h-[400px]">
                                 <HighchartsReact
                                     highcharts={Highcharts}
@@ -467,7 +467,7 @@ const LanguageDashboard: React.FC = () => {
                         </div>
 
                         {/* Bar chart */}
-                        <div className="bg-slate-700 rounded-lg shadow-md p-6 border border-slate-700">
+                        <div className="bg-slate-600 rounded-lg shadow-md p-6 border border-slate-700">
                             <div className="h-[400px]">
                                 <HighchartsReact
                                     highcharts={Highcharts}
@@ -477,7 +477,7 @@ const LanguageDashboard: React.FC = () => {
                         </div>
 
                         {/* Bubble chart */}
-                        <div className="bg-slate-700 rounded-lg shadow-md p-6 border border-slate-700">
+                        <div className="bg-slate-600 rounded-lg shadow-md p-6 border border-slate-700">
                             <div className="h-[400px]">
                                 <HighchartsReact
                                     highcharts={Highcharts}
@@ -487,7 +487,7 @@ const LanguageDashboard: React.FC = () => {
                         </div>
 
                         {/* Trends over time */}
-                        <div className="bg-slate-700 rounded-lg shadow-md p-6 border border-slate-700">
+                        <div className="bg-slate-600 rounded-lg shadow-md p-6 border border-slate-700">
                             <div className="h-[400px]">
                                 <HighchartsReact
                                     highcharts={Highcharts}
@@ -517,23 +517,24 @@ const LanguageDashboard: React.FC = () => {
                 </div>
 
                 {/* Song Table Modal */}
-                {selectedLanguage && (
+    
+                
                     <SongTableModal
-                        title={`Songs in ${selectedLanguage.name}`}
-                        songs={selectedLanguage.songs}
+                        title={`Songs in ${selectedLanguage?.name}`}
+                        songs={selectedLanguage?.songs}                        
                         isOpen={showSongTable}
                         onClose={() => {
                             setShowSongTable(false);
-                            setSelectedLanguage(null);
+                            //setSelectedLanguage(null);
                         }}
                         summaryStats={[
-                            { label: 'Total Songs', value: selectedLanguage.count },
-                            { label: 'Wins', value: selectedLanguage.wins },
-                            { label: 'Top 10s', value: selectedLanguage.topTens },
-                            { label: 'Avg Place', value: selectedLanguage.avgPlace.toFixed(1) }
+                            { label: 'Total Songs', value: selectedLanguage?.count },
+                            { label: 'Wins', value: selectedLanguage?.wins },
+                            { label: 'Top 10s', value: selectedLanguage?.topTens },
+                            { label: 'Avg Place', value: selectedLanguage?.avgPlace.toFixed(1) }
                         ]}
                     />
-                )}
+
             </div>
         </div>
     );

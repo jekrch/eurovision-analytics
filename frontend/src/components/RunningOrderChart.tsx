@@ -160,7 +160,7 @@ const RunningOrderChart: React.FC = () => {
 
     return (
         // Using a darker background for the chart container for consistency with PlaceChart
-        <div className="container marker:mt-4 max-w-[90vw] m-auto mt-[2em] mb-[2em] p-4 bg-slate-600 rounded-lg shadow-lg">
+        <div className="container pb-6 m-auto max-w-7xl px-10 rounded-lg mb-4">
             {isLoading ? (
                 <div className="flex items-center justify-center h-[400px]">
                     {/* Updated spinner color to be more visible on the dark background */}
@@ -168,7 +168,7 @@ const RunningOrderChart: React.FC = () => {
                 </div>
             ) : (
                 // Set a specific height for the chart container
-                <div className="h-[400px] w-full mt-[2em]">
+                <div className="h-[400px] w-full mt-[2em] bg-slate-600 p-10 rounded-lg">
                     <LineChart data={chartData} options={chartOptions} />
                 </div>
             )}

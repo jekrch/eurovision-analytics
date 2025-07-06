@@ -1,17 +1,17 @@
 import React from 'react';
 import SongTable from './SongTable';
 import { Song } from '../models/Song';
-import Modal from './modal';
+import Modal from './Modal';
 
 
 interface SongTableModalProps {
-    title: string;
-    songs: Song[];
+    title?: string;
+    songs?: Song[];
     isOpen: boolean;
     onClose: () => void;
     summaryStats?: {
         label: string;
-        value: string | number;
+        value?: string | number;
     }[];
 }
 
@@ -24,7 +24,7 @@ const SongTableModal: React.FC<SongTableModalProps> = ({
 }) => {
     // Create footer content from summary stats
     const footer = summaryStats && summaryStats.length > 0 ? (
-        <div className={`grid grid-cols-2 md:grid-cols-${Math.min(summaryStats.length, 4)} gap-4 text-sm`}>
+        <div className={`grid grid-cols-2 md:grid-cols-${Math.min(summaryStats.length, 4)} gap-1 text-sm`}>
             {summaryStats.map((stat, index) => (
                 <div key={index}>
                     <span className="font-semibold text-slate-300">{stat.label}:</span>
@@ -41,7 +41,7 @@ const SongTableModal: React.FC<SongTableModalProps> = ({
             title={title}
             footer={footer}
         >
-            <SongTable songs={songs} />
+            <SongTable songs={songs ?? []} />
         </Modal>
     );
 };

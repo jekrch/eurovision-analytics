@@ -82,9 +82,9 @@ const SongTable: React.FC<SongTableProps> = ({ songs, className = '' }) => {
     };
 
     return (
-        <div className={`overflow-auto ${className}`}>
-            <table className="min-w-full divide-y divide-slate-700">
-                <thead className="bg-slate-600 sticky top-0 z-10">
+<div className={`overflow-y-auto h-[calc(100vh-350px)] ${className} rounded-t-lg`}>
+        <table className="min-w-full divide-y divide-slate-700">
+            <thead className="bg-slate-600 sticky top-0 z-10 ">
                     <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                             Thumbnail
