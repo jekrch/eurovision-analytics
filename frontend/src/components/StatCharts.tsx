@@ -24,6 +24,7 @@ const StatCharts: React.FC = () => {
         title={'Average Final Place by Final Running Order'}
       />
       <RunningOrderChart />
+      
       <Header
         title={'Language Distribution'}
       />

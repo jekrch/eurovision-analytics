@@ -24,7 +24,7 @@ const SongTableModal: React.FC<SongTableModalProps> = ({
 }) => {
     // Create footer content from summary stats
     const footer = summaryStats && summaryStats.length > 0 ? (
-        <div className={`grid grid-cols-2 md:grid-cols-${Math.min(summaryStats.length, 4)} gap-1 text-sm`}>
+        <div className={`grid grid-cols-2 md:grid-cols-${Math.min(summaryStats.length, 4)} gap-4 text-sm`}>
             {summaryStats.map((stat, index) => (
                 <div key={index}>
                     <span className="font-semibold text-slate-300">{stat.label}:</span>

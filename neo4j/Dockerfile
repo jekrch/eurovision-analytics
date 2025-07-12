@@ -1,4 +1,4 @@
-FROM neo4j:5.19
+FROM neo4j:5.26.9
 
 ENV NEO4J_ACCEPT_LICENSE_AGREEMENT=yes \
     NEO4J_apoc_export_file_enabled=true \
