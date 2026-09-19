@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import 'highcharts/highcharts-more';
+import { applyHighchartsTheme, card, chartColors, colors, spinner } from '../theme';
 import SongTableModal from './SongTableModal';
+import StatTile from './StatTile';
 import { Song } from '../models/Song';
 import classNames from 'classnames';
 
@@ -18,87 +20,13 @@ interface LanguageData {
     yearlyCounts: { [year: number]: number };
 }
 
+applyHighchartsTheme();
+
 const LanguageDashboard: React.FC = () => {
     const [data, setData] = useState<LanguageData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedLanguage, setSelectedLanguage] = useState<LanguageData | null>(null);
     const [showSongTable, setShowSongTable] = useState(false);
-
-    // Earthy color palette for chart elements
-    const chartColors = [
-        '#75c8ae', // Mint/Teal
-        '#e5771e', // Dark Orange
-        '#f4a127', // Light Orange
-        '#5a3d2b', // Dark Brown
-        '#ffecb4', // Light Cream
-        '#8ab5a3', // Lighter teal variant
-        '#c9935f', // Mid orange-brown
-        '#6d9987', // Darker teal variant
-        '#d4a574', // Light brown
-        '#4a7c68', // Deep teal
-        '#b87333', // Copper
-        '#9fc5b8', // Pale teal
-        '#cd853f', // Peru
-        '#5e8072', // Sage green
-        '#daa520', // Goldenrod
-    ];
-
-    // Highcharts theme with blue-gray UI styling
-    Highcharts.setOptions({
-        colors: chartColors,
-        chart: {
-            backgroundColor: 'transparent',
-            style: {
-                fontFamily: 'system-ui, -apple-system, sans-serif'
-            }
-        },
-        title: {
-            style: {
-                color: '#e2e8f0',
-                fontSize: '16px',
-                fontWeight: '600'
-            }
-        },
-        xAxis: {
-            labels: {
-                style: {
-                    color: '#94a3b8'
-                }
-            },
-            lineColor: '#475569',
-            tickColor: '#475569'
-        },
-        yAxis: {
-            labels: {
-                style: {
-                    color: '#94a3b8'
-                }
-            },
-            title: {
-                style: {
-                    color: '#94a3b8'
-                }
-            },
-            gridLineColor: '#334155'
-        },
-        legend: {
-            itemStyle: {
-                color: '#e2e8f0',
-                fontWeight: '400'
-            },
-            itemHoverStyle: {
-                color: '#f1f5f9'
-            }
-        },
-        tooltip: {
-            backgroundColor: '#334155',
-            borderColor: '#475569',
-            borderRadius: 6,
-            style: {
-                color: '#f1f5f9'
-            }
-        }
-    });
 
     useEffect(() => {
         const fetchData = async () => {
@@ -219,8 +147,8 @@ const LanguageDashboard: React.FC = () => {
                     format: '<b>{point.name}</b>: {point.y}',
                     distance: 15,
                     style: {
-                        color: '#e2e8f0',
-                        textOutline: '1px #1e293b',
+                        color: colors.textPrimary,
+                        textOutline: `1px ${colors.surfacePrimary}`,
                         fontSize: '11px'
                     }
                 },
@@ -320,7 +248,7 @@ const LanguageDashboard: React.FC = () => {
             type: 'bubble',
             backgroundColor: 'transparent',
             plotBorderWidth: 1,
-            plotBorderColor: '#475569',
+            plotBorderColor: colors.axisLine,
             zooming: {
                 type: 'xy'
             }
@@ -357,8 +285,8 @@ const LanguageDashboard: React.FC = () => {
                     format: '{point.name}',
                     style: {
                         fontSize: '11px',
-                        textOutline: '1px #1e293b',
-                        color: '#e2e8f0'
+                        textOutline: `1px ${colors.surfacePrimary}`,
+                        color: colors.textPrimary
                     }
                 },
                 point: {
@@ -443,21 +371,21 @@ const LanguageDashboard: React.FC = () => {
 
     if (isLoading) {
         return (
-            <div className="container pb-10 m-auto max-w-7xl">
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-10">
                 <div className="flex items-center justify-center h-44">
-                    <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-r-2 border-b-6 border-slate-400"></div>
+                    <div className={spinner}></div>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen ">
-            <div className="container pb-10 m-auto max-w-7xl px-10 ">
-                <div className="mb-8 w-full mt-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div>
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-10">
+                <div className="w-full mt-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                         {/* Donut chart */}
-                        <div className="bg-slate-600 rounded-lg shadow-md p-6 border border-slate-700">
+                        <div className={`${card} p-4 sm:p-6 min-w-0`}>
                             <div className="h-[400px]">
                                 <HighchartsReact
                                     highcharts={Highcharts}
@@ -467,7 +395,7 @@ const LanguageDashboard: React.FC = () => {
                         </div>
 
                         {/* Bar chart */}
-                        <div className="bg-slate-600 rounded-lg shadow-md p-6 border border-slate-700">
+                        <div className={`${card} p-4 sm:p-6 min-w-0`}>
                             <div className="h-[400px]">
                                 <HighchartsReact
                                     highcharts={Highcharts}
@@ -477,7 +405,7 @@ const LanguageDashboard: React.FC = () => {
                         </div>
 
                         {/* Bubble chart */}
-                        <div className="bg-slate-600 rounded-lg shadow-md p-6 border border-slate-700">
+                        <div className={`${card} p-4 sm:p-6 min-w-0`}>
                             <div className="h-[400px]">
                                 <HighchartsReact
                                     highcharts={Highcharts}
@@ -487,7 +415,7 @@ const LanguageDashboard: React.FC = () => {
                         </div>
 
                         {/* Trends over time */}
-                        <div className="bg-slate-600 rounded-lg shadow-md p-6 border border-slate-700">
+                        <div className={`${card} p-4 sm:p-6 min-w-0`}>
                             <div className="h-[400px]">
                                 <HighchartsReact
                                     highcharts={Highcharts}
@@ -498,20 +426,11 @@ const LanguageDashboard: React.FC = () => {
                     </div>
 
                     {/* Statistics Summary */}
-                    <div className="bg-slate-700 rounded-lg shadow-md p-6 border border-slate-700">
-                        <h2 className="text-xl font-bold mb-4 text-slate-200">Language Statistics</h2>
+                    <div className={`${card} p-4 sm:p-6`}>
+                        <h2 className="text-base font-semibold mb-4 text-[var(--er-text-primary)]">Language Statistics</h2>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div className="bg-slate-600 rounded-lg p-4">
-                                <h3 className="font-semibold text-slate-300">Total Languages</h3>
-                                <p className="text-2xl font-bold text-slate-100">{data.length}</p>
-                            </div>
-                            <div className="bg-slate-600 rounded-lg p-4">
-                                <h3 className="font-semibold text-slate-300">Languages with Wins</h3>
-                                <p className="text-2xl font-bold text-slate-100">
-                                    {data.filter(l => l.wins > 0).length}
-                                </p>
-                            </div>
-
+                            <StatTile label="Total Languages" value={data.length} />
+                            <StatTile label="Languages with Wins" value={data.filter(l => l.wins > 0).length} />
                         </div>
                     </div>
                 </div>

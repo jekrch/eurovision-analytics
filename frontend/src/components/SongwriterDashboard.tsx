@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import 'highcharts/highcharts-more';
+import { applyHighchartsTheme, card, chartColors, colors, spinner } from '../theme';
 import { Song } from '../models/Song';
 import SongTableModal from './SongTableModal';
+import StatTile from './StatTile';
 
 
 interface SongwriterStats {
@@ -28,6 +30,8 @@ const getYouTubeThumbnailUrl = (videoId: string | null): string | null => {
     return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 };
 
+applyHighchartsTheme();
+
 const SongwriterDashboard: React.FC = () => {
     const [songwriters, setSongwriters] = useState<SongwriterStats[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -35,82 +39,6 @@ const SongwriterDashboard: React.FC = () => {
     const [showSongTable, setShowSongTable] = useState(false);
     const [sortKey, setSortKey] = useState<SortKey>('year');
     const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
-
-    // Earthy color palette for chart elements only
-    const chartColors = [
-        '#75c8ae', // Mint/Teal
-        '#e5771e', // Dark Orange
-        '#f4a127', // Light Orange
-        '#5a3d2b', // Dark Brown
-        '#ffecb4', // Light Cream
-        '#8ab5a3', // Lighter teal variant
-        '#c9935f', // Mid orange-brown
-        '#6d9987', // Darker teal variant
-        '#d4a574', // Light brown
-        '#4a7c68', // Deep teal
-        '#b87333', // Copper
-        '#9fc5b8', // Pale teal
-        '#cd853f', // Peru
-        '#5e8072', // Sage green
-        '#daa520', // Goldenrod
-    ];
-
-    // Highcharts theme with blue-gray UI styling
-    Highcharts.setOptions({
-        colors: chartColors,
-        chart: {
-            backgroundColor: 'transparent',
-            style: {
-                fontFamily: 'system-ui, -apple-system, sans-serif'
-            }
-        },
-        title: {
-            style: {
-                color: '#e2e8f0',
-                fontSize: '16px',
-                fontWeight: '600'
-            }
-        },
-        xAxis: {
-            labels: {
-                style: {
-                    color: '#94a3b8'
-                }
-            },
-            lineColor: '#475569',
-            tickColor: '#475569'
-        },
-        yAxis: {
-            labels: {
-                style: {
-                    color: '#94a3b8'
-                }
-            },
-            title: {
-                style: {
-                    color: '#94a3b8'
-                }
-            },
-            gridLineColor: '#334155'
-        },
-        legend: {
-            itemStyle: {
-                color: '#e2e8f0',
-                fontWeight: '400'
-            },
-            itemHoverStyle: {
-                color: '#f1f5f9'
-            }
-        },
-        tooltip: {
-            backgroundColor: '#334155',
-            borderColor: '#475569',
-            borderRadius: 6,
-            style: {
-                color: '#f1f5f9'
-            }
-        }
-    });
 
     useEffect(() => {
         const fetchData = async () => {
@@ -287,8 +215,8 @@ const SongwriterDashboard: React.FC = () => {
                 dataLabels: {
                     enabled: true,
                     style: {
-                        color: '#e2e8f0',
-                        textOutline: '1px #1e293b'
+                        color: colors.textPrimary,
+                        textOutline: `1px ${colors.surfacePrimary}`
                     }
                 },
                 cursor: 'pointer',
@@ -416,7 +344,7 @@ const SongwriterDashboard: React.FC = () => {
             type: 'bubble',
             backgroundColor: 'transparent',
             plotBorderWidth: 1,
-            plotBorderColor: '#475569',
+            plotBorderColor: colors.axisLine,
             zooming: {
                 type: 'xy'
             }
@@ -453,8 +381,8 @@ const SongwriterDashboard: React.FC = () => {
                     format: '{point.name}',
                     style: {
                         fontSize: '12px',
-                        textOutline: '1px #1e293b',
-                        color: '#e2e8f0'
+                        textOutline: `1px ${colors.surfacePrimary}`,
+                        color: colors.textPrimary
                     }
                 },
                 point: {
@@ -507,14 +435,13 @@ const SongwriterDashboard: React.FC = () => {
                 allowPointSelect: true,
                 cursor: 'pointer',
                 innerSize: '30%',
-                borderWidth: 0,
                 dataLabels: {
                     enabled: true,
                     format: '<b>{point.name}</b>: {point.y} wins',
                     distance: 15,
                     style: {
-                        color: '#e2e8f0',
-                        textOutline: '1px #1e293b'
+                        color: colors.textPrimary,
+                        textOutline: `1px ${colors.surfacePrimary}`
                     }
                 },
                 point: {
@@ -544,9 +471,9 @@ const SongwriterDashboard: React.FC = () => {
 
     if (isLoading) {
         return (
-            <div className="container pb-10 m-auto max-w-7xl">
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-10">
                 <div className="flex items-center justify-center h-44">
-                    <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-r-2 border-b-6 border-slate-400"></div>
+                    <div className={spinner}></div>
                 </div>
             </div>
         );
@@ -555,11 +482,11 @@ const SongwriterDashboard: React.FC = () => {
 
 
     return (
-            <div className="container pb-6 m-auto max-w-7xl px-10">
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-10">
                 <div className="w-full mt-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                         {/* Top songwriters by song count */}
-                        <div className="bg-slate-600 rounded-lg shadow-md p-6 border border-slate-700">
+                        <div className={`${card} p-4 sm:p-6 min-w-0`}>
                             <div className="h-[400px]">
                                 <HighchartsReact
                                     highcharts={Highcharts}
@@ -569,7 +496,7 @@ const SongwriterDashboard: React.FC = () => {
                         </div>
 
                         {/* Multi-line placement statistics */}
-                        <div className="bg-slate-600 rounded-lg shadow-md p-6 border border-slate-700">
+                        <div className={`${card} p-4 sm:p-6 min-w-0`}>
                             <div className="h-[400px]">
                                 <HighchartsReact
                                     highcharts={Highcharts}
@@ -579,7 +506,7 @@ const SongwriterDashboard: React.FC = () => {
                         </div>
 
                         {/* Avg placement bubble chart */}
-                        <div className="bg-slate-600 rounded-lg shadow-md p-6 border border-slate-700">
+                        <div className={`${card} p-4 sm:p-6 min-w-0`}>
                             <div className="h-[400px]">
                                 <HighchartsReact
                                     highcharts={Highcharts}
@@ -589,7 +516,7 @@ const SongwriterDashboard: React.FC = () => {
                         </div>
 
                         {/* Top by wins donut */}
-                        <div className="bg-slate-600 rounded-lg shadow-md p-6 border border-slate-700">
+                        <div className={`${card} p-4 sm:p-6 min-w-0`}>
                             <div className="h-[400px]">
                                 <HighchartsReact
                                     highcharts={Highcharts}
@@ -600,21 +527,12 @@ const SongwriterDashboard: React.FC = () => {
                     </div>
 
                     {/* Statistics Summary */}
-                    <div className="bg-slate-600 rounded-lg shadow-md p-6 border border-slate-700">
-                        <h2 className="text-xl font-bold mb-4 text-slate-200">Quick Statistics</h2>
+                    <div className={`${card} p-4 sm:p-6`}>
+                        <h2 className="text-base font-semibold mb-4 text-[var(--er-text-primary)]">Quick Statistics</h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="bg-slate-500 rounded-lg p-4">
-                                <h3 className="font-semibold text-slate-300">Total Songwriters</h3>
-                                <p className="text-2xl font-bold text-slate-100">{songwriters.length}</p>
-                            </div>
-                            <div className="bg-slate-500 rounded-lg p-4">
-                                <h3 className="font-semibold text-slate-300">Writers with Wins</h3>
-                                <p className="text-2xl font-bold text-slate-100">{songwriters.filter((w: SongwriterStats) => w.wins > 0).length}</p>
-                            </div>
-                            <div className="bg-slate-500 rounded-lg p-4">
-                                <h3 className="font-semibold text-slate-300">Writers with 5+ Songs</h3>
-                                <p className="text-2xl font-bold text-slate-100">{songwriters.filter((w: SongwriterStats) => w.songCount >= 5).length}</p>
-                            </div>
+                            <StatTile label="Total Songwriters" value={songwriters.length} />
+                            <StatTile label="Writers with Wins" value={songwriters.filter((w: SongwriterStats) => w.wins > 0).length} />
+                            <StatTile label="Writers with 5+ Songs" value={songwriters.filter((w: SongwriterStats) => w.songCount >= 5).length} />
                         </div>
                     </div>
                 </div>

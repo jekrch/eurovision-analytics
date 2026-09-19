@@ -8,6 +8,7 @@ import { songTooltipHandler } from '../utils/TooltipUtils';
 import { Country } from '../models/Country';
 import Header from './Header';
 import { Song } from '../models/Song';
+import { card, colors as theme, eyebrow } from '../theme';
 
 Chart.register(...registerables);
 
@@ -93,14 +94,12 @@ const PlaceChart: React.FC = () => {
         }
     }, [selectedCountry]);
 
-    // Consistent color palette for a dark theme
     const colors = {
-        background: 'rgb(30, 41, 59)',      // slate-800
-        text: 'rgb(203, 213, 225)',         // slate-300
-        line: 'rgb(100, 116, 139)',         // slate-500
-        point: 'rgb(226, 232, 240)',        // slate-200
-        grid: 'rgb(51, 65, 85)',            // slate-700
-        firstPlace: '#FBBF24',              // amber-400 (a nice gold for winners)
+        text: theme.textMuted,
+        line: theme.copper,
+        point: theme.textPrimary,
+        grid: theme.grid,
+        firstPlace: theme.gold,
     };
 
     const chartData = {
@@ -120,7 +119,8 @@ const PlaceChart: React.FC = () => {
                 }),
                 fill: false,
                 borderColor: colors.line,
-                tension: 0.1,
+                borderWidth: 2,
+                tension: 0.25,
                 spanGaps: true,
                 pointHitRadius: 20,
                 pointRadius: (context: any) => {
@@ -154,9 +154,7 @@ const PlaceChart: React.FC = () => {
                 external: songTooltipHandler
             },
             legend: {
-                labels: {
-                    color: colors.text, // Style legend text
-                },
+                display: false,
             },
         },
         scales: {
@@ -214,22 +212,27 @@ const PlaceChart: React.FC = () => {
     };
 
     return (
-        <div className="container marker:mt-4 mb-8 m-auto pb-6 max-w-7xl px-10">
-            <div className="mb-4 mt-6 flex items-center justify-center">
-                <CountryDropdown
-                    className="mb-4 absolute mt-14"
-                    countries={countries}
-                    selectedCountry={selectedCountry}
-                    onCountryChange={setSelectedCountry}
-                />
-            </div>
-            
-            <div className="max-w-[90vw] m-auto mt-[4em] p-4 bg-slate-600 rounded-lg shadow-lg">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 mt-8">
+            <div className={`${card} p-4 sm:p-6`}>
+                <div className="flex flex-wrap items-end justify-between gap-3 mb-4">
+                    <div>
+                        <p className={eyebrow}>Country</p>
+                        <CountryDropdown
+                            className="mt-1.5"
+                            countries={countries}
+                            selectedCountry={selectedCountry}
+                            onCountryChange={setSelectedCountry}
+                        />
+                    </div>
+                    <p className="text-xs text-[var(--er-text-muted)]">
+                        <span className="text-[var(--er-accent-gold)]">★</span> marks a win
+                    </p>
+                </div>
                 <LineChart data={chartData} options={chartOptions} />
             </div>
 
-            <div className="max-w-[90vw] m-auto relative overflow-x-auto shadow-md sm:rounded-lg mt-8">
-                <SongTable songs={songs} className="max-h-[50em]" />
+            <div className="mt-6">
+                <SongTable songs={songs} className="max-h-[50em] bg-[var(--er-card-surface)]" />
             </div>
         </div>
     );

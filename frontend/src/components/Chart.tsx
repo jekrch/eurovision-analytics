@@ -6,8 +6,14 @@ interface ChartProps {
     options: any;
 }
 
+// Chart.js sizes a responsive chart from its parent, so the canvas gets a
+// dedicated, relatively positioned box of fixed height to measure.
 const LineChart: React.FC<ChartProps> = ({ data, options }) => {
-    return <Line className="min-h-350 h-[15em]" data={data} options={options as any} />;
+    return (
+        <div className="relative h-[18em] w-full">
+            <Line data={data} options={options as any} />
+        </div>
+    );
 };
 
 export default LineChart;

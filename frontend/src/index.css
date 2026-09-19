@@ -4,9 +4,10 @@
 
 .tooltip {
     z-index: 9999;
-    background: rgba(0, 0, 0, 0.6);
-    border-radius: 3px;
-    color: white;
+    background: var(--er-tooltip-bg);
+    border-radius: 10px;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 14px 36px -10px rgba(0, 0, 0, 0.65);
+    color: var(--er-text-primary);
     opacity: 1;
     pointer-events: none;
     position: absolute;
@@ -49,13 +50,14 @@
   }
   
   .tooltip-header-cell-primary {
-    background-color: rgba(149, 176, 207, 0.6);
+    background-color: color-mix(in srgb, var(--er-button-primary) 35%, transparent);
+    border-radius: 6px;
     padding-left: 15px;
     padding-right: 15px;
   }
   
   .tooltip-header-cell-secondary {
-    color: #e9f0f2;
+    color: var(--er-text-secondary);
     font-size: 15px;
     font-weight: lighter;
   }
@@ -66,6 +68,7 @@
   }
   
   .tooltip-separator {
+    border-color: rgba(255, 255, 255, 0.1);
     margin-bottom: 8px;
     margin-top: 8px;
   }
@@ -100,3 +103,41 @@
     max-height: 0;
     transition: max-height 500ms ease-in-out;
   }
+
+/* Two range inputs stacked on one track make a from/to year slider. Only the
+   thumbs take pointer events so either can be grabbed where they overlap. */
+.range-dual input[type='range'] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  margin: 0;
+  pointer-events: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+}
+
+.range-dual input[type='range']::-webkit-slider-thumb {
+  pointer-events: auto;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: var(--er-interactive-primary);
+  border: 2px solid var(--er-surface-primary);
+  cursor: grab;
+}
+
+.range-dual input[type='range']::-moz-range-thumb {
+  pointer-events: auto;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: var(--er-interactive-primary);
+  border: 2px solid var(--er-surface-primary);
+  cursor: grab;
+}
+
+.range-dual input[type='range']:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--er-focus-ring) 50%, transparent);
+}
