@@ -3,6 +3,7 @@ import { Line } from 'react-chartjs-2';
 import { Chart, ChartOptions, PointElement, Tick, registerables } from 'chart.js';
 import LineChart from './Chart'; // Assuming LineChart is a local component
 import { countTooltipHandler } from '../utils/TooltipUtils'; // Assuming TooltipUtils is in this path
+import { card, colors as theme, spinner } from '../theme';
 
 Chart.register(...registerables);
 
@@ -15,14 +16,11 @@ const RunningOrderChart: React.FC = () => {
     const [data, setData] = useState<AverageFinalPlaceData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Consistent color palette from PlaceChart
     const colors = {
-        background: 'rgb(30, 41, 59)',      // slate-800
-        text: 'rgb(203, 213, 225)',         // slate-300
-        line: 'rgb(100, 116, 139)',         // slate-500
-        point: 'rgb(226, 232, 240)',        // slate-200
-        grid: 'rgb(51, 65, 85)',            // slate-700
-        firstPlace: '#FBBF24',              // amber-400 (not used here, but kept for consistency)
+        text: theme.textMuted,
+        line: theme.plum,
+        point: theme.textPrimary,
+        grid: theme.grid,
     };
 
     useEffect(() => {
@@ -91,7 +89,8 @@ const RunningOrderChart: React.FC = () => {
                 data: data.map((item) => item.averageFinalPlace),
                 fill: false,
                 borderColor: colors.line, 
-                tension: 0.1,
+                borderWidth: 2,
+                tension: 0.25,
                 spanGaps: true,
                 pointHitRadius: 20,
                 pointRadius: 4,
@@ -112,9 +111,7 @@ const RunningOrderChart: React.FC = () => {
                 external: countTooltipHandler,
             },
             legend: {
-                labels: {
-                    color: colors.text, 
-                },
+                display: false,
             },
         },
         scales: {
@@ -159,16 +156,13 @@ const RunningOrderChart: React.FC = () => {
     };
 
     return (
-        // Using a darker background for the chart container for consistency with PlaceChart
-        <div className="container pb-6 m-auto max-w-7xl px-10 rounded-lg mb-4">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 mt-8">
             {isLoading ? (
                 <div className="flex items-center justify-center h-[400px]">
-                    {/* Updated spinner color to be more visible on the dark background */}
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-slate-300"></div>
+                    <div className={spinner}></div>
                 </div>
             ) : (
-                // Set a specific height for the chart container
-                <div className="h-[400px] w-full mt-[2em] bg-slate-600 p-10 rounded-lg">
+                <div className={`${card} p-4 sm:p-6`}>
                     <LineChart data={chartData} options={chartOptions} />
                 </div>
             )}

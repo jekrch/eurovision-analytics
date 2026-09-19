@@ -1,0 +1,164 @@
+/* Palette borrowed from eurovision-ranker's default theme ([data-theme="s"] in
+   its src/themes.css), under the same --er- names so the two apps can be kept
+   in sync by copying values across. Charts can't read CSS variables, so the
+   colors they need are mirrored in src/theme.ts — change both together. */
+:root {
+  /* === SURFACES === */
+  --er-surface-primary: #1a1118;
+  --er-surface-secondary: #241a20;
+  --er-surface-tertiary: #342528;
+  --er-surface-tertiary-70: color-mix(in srgb, var(--er-surface-tertiary) 70%, transparent);
+  --er-surface-accent: #3d2845;
+  --er-surface-dark: #241a20;
+  --er-surface-medium: #4d3555;
+  --er-surface-light: #c8926d;
+  --er-body-bg: #0f0a0d;
+
+  /* the ranked-card surface: one step up from primary, letting a little of the
+     page gradient show through */
+  --er-card-surface-base: color-mix(in srgb, var(--er-surface-primary) 62%, var(--er-surface-tertiary));
+  --er-card-surface: color-mix(in srgb, var(--er-card-surface-base) 86%, transparent);
+
+  /* === GRADIENTS === */
+  --er-nav-gradient-start: #1a1118;
+  --er-nav-gradient-end: #4d3555;
+  --er-ranked-bg-end: #342528;
+  --er-gradient-text-1: #d5c5be;
+  --er-gradient-text-2: #b8825d;
+  --er-gradient-text-3: #8a6897;
+
+  /* === INTERACTIVE === */
+  --er-interactive-primary: #c8926d;
+  --er-interactive-text-light: #e5d0c8;
+  --er-button-primary: #b8825d;
+  --er-button-primary-hover: #c8926d;
+  --er-button-neutral: #342528;
+  --er-button-neutral-hover: #4d3555;
+  --er-focus-ring: #c8926d;
+
+  /* === TEXT === */
+  --er-text-primary: #e5d8d2;
+  --er-text-secondary: #d5c5be;
+  --er-text-tertiary: #c5b5ae;
+  --er-text-muted: #a59490;
+  --er-text-subtle: #baa8a4;
+
+  /* === BORDERS === */
+  --er-border-secondary: #c8926d;
+  --er-border-tertiary: #7a5887;
+  --er-border-subtle: #4d3555;
+
+  /* === ACCENTS === */
+  --er-accent-blue: #a8826d;
+  --er-accent-gold: #e0b25b;
+
+  /* === SCROLLBAR === */
+  --er-scrollbar-thumb: #b8825d;
+  --er-scrollbar-thumb-opacity: 0.52;
+  --er-scrollbar-thumb-hover: #a8724d;
+  --er-scrollbar-track: #4d3555;
+
+  --er-tooltip-bg: color-mix(in srgb, var(--er-surface-tertiary) 92%, #fff);
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--er-surface-secondary);
+  color: var(--er-text-tertiary);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* === SCROLLBAR === */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--er-scrollbar-thumb) calc(var(--er-scrollbar-thumb-opacity) * 100%), transparent);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--er-scrollbar-thumb-hover);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* === PAGE BACKGROUND ===
+   The ranker's glow rising from the bottom of the screen. It lives on a fixed
+   ::before layer so the slow "breathe" animates transform (composited) rather
+   than repainting the gradient every frame. */
+.page-bg {
+  position: relative;
+  isolation: isolate;
+}
+
+.page-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at bottom, var(--er-ranked-bg-end) 0%, var(--er-nav-gradient-start) 100%);
+  background-repeat: no-repeat;
+  transform-origin: center bottom;
+  animation: bg-breathe 10s infinite ease-in-out;
+  will-change: transform;
+}
+
+@keyframes bg-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.5, 1.1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-bg::before {
+    animation: none;
+  }
+}
+
+/* === NAV === */
+.nav-diagonal-split-bg {
+  background: linear-gradient(135deg, var(--er-nav-gradient-start), var(--er-nav-gradient-end));
+}
+
+.product-name {
+  font-size: 1.225rem;
+  font-weight: bolder;
+  letter-spacing: -0.045em;
+}
+
+.gradient-text {
+  background: linear-gradient(155deg, var(--er-gradient-text-1), var(--er-gradient-text-2), var(--er-gradient-text-3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes pulseOnLoad {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+.pulse-on-load {
+  animation: pulseOnLoad 1.2s ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-on-load {
+    animation: none;
+  }
+}

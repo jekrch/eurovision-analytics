@@ -2,6 +2,7 @@ import React from 'react';
 import SongTable from './SongTable';
 import { Song } from '../models/Song';
 import Modal from './Modal';
+import { eyebrow } from '../theme';
 
 
 interface SongTableModalProps {
@@ -23,12 +24,15 @@ const SongTableModal: React.FC<SongTableModalProps> = ({
     summaryStats 
 }) => {
     // Create footer content from summary stats
+    // spelled out so Tailwind can find the class names when it scans this file
+    const columnClasses = ['md:grid-cols-1', 'md:grid-cols-2', 'md:grid-cols-3', 'md:grid-cols-4'];
+
     const footer = summaryStats && summaryStats.length > 0 ? (
-        <div className={`grid grid-cols-2 md:grid-cols-${Math.min(summaryStats.length, 4)} gap-4 text-sm`}>
+        <div className={`grid grid-cols-2 ${columnClasses[Math.min(summaryStats.length, 4) - 1]} gap-4`}>
             {summaryStats.map((stat, index) => (
                 <div key={index}>
-                    <span className="font-semibold text-slate-300">{stat.label}:</span>
-                    <span className="ml-2 text-slate-100 font-bold">{stat.value}</span>
+                    <p className={eyebrow}>{stat.label}</p>
+                    <p className="mt-0.5 text-lg font-semibold tabular-nums text-[var(--er-text-primary)]">{stat.value}</p>
                 </div>
             ))}
         </div>

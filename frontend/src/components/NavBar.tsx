@@ -1,5 +1,7 @@
+import classNames from 'classnames';
 import React, { useEffect, useRef, useState } from 'react';
 import { CSSTransition } from 'react-transition-group';
+import HeartIcon from './HeartIcon';
 
 interface NavItem {
   label: string;
@@ -9,13 +11,19 @@ interface NavItem {
 
 interface NavbarProps {
   items: NavItem[];
+  activePath: string;
   handleTabChange: (tab: string) => void;
 }
+
+const ExternalIcon: React.FC = () => (
+  <svg className="w-2.5 h-2.5 opacity-60" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+    <path d="M4.5 2.5h-2v7h7v-2M7 2.5h2.5V5M9.5 2.5 5.5 6.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
 const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
 
   const [isOpen, setIsOpen] = useState(false);
-  const [activeItem, setActiveItem] = useState<string>();
   const menuRef = useRef<HTMLDivElement>(null);
 
   function selectTab(navItem: NavItem) {
@@ -23,7 +31,6 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
       window.open(navItem.url,'_blank');
       return;
     }
-    setActiveItem(navItem.path);
     props.handleTabChange(navItem.path!);
   }
 
@@ -46,51 +53,58 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
 
   }, [isOpen]);
 
+  const isActive = (item: NavItem) => props.activePath === item.path && !item.url;
+
   return (
-    <nav className="bg-slate-800 shadow-md max-w-[100vw] border-b border-slate-700">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14">
+    <nav ref={menuRef} className="nav-diagonal-split-bg sticky top-0 z-40 shadow-lg shadow-black/20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-10">
+        <div className="flex items-center justify-between h-12">
           <div className="flex items-center">
-            <span className="text-slate-300 text-xl font-bold font-sans tracking-tighter">
+            <span className="gradient-text product-name">
               Eurovision Analytics
             </span>
-            <div className="hidden lg:block">
-              <div className="ml-10 flex items-baseline space-x-4">
-                {props.items.map((item) => (
-                  <button
-                    key={item.path}
-                    className={`${activeItem === item.path && !item.url
-                        ? 'bg-slate-700 text-white font-bold'
-                        : 'text-gray-300 hover:bg-slate-700 hover:text-white'
-                      } px-3 py-2 text-sm font-medium transition-colors duration-200`}
-                    onClick={() => selectTab(item)}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <HeartIcon className="inline align-middle ml-[0.5em] mb-1 w-5 h-5 pulse-on-load" />
           </div>
-          <div ref={menuRef} className="-mr-2 flex md:hidden">
+
+          <ul className="hidden lg:flex items-center">
+            {props.items.map((item) => (
+              <li key={item.label}>
+                <button
+                  className={classNames(
+                    'inline-flex items-center gap-1.5 px-4 py-3 text-sm border-b-2 transition-colors duration-200',
+                    isActive(item)
+                      ? 'text-[var(--er-interactive-primary)] border-[var(--er-interactive-primary)]'
+                      : 'text-[var(--er-text-secondary)] border-transparent hover:text-[var(--er-text-muted)]'
+                  )}
+                  onClick={() => selectTab(item)}
+                >
+                  {item.label}
+                  {item.url && <ExternalIcon />}
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          <div className="flex lg:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
               type="button"
-              className="inline-flex items-center justify-center p-1 mr-6 text-gray-300 hover:text-white hover:bg-slate-700 focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-slate-500 transition-colors duration-200 rounded-md"
+              className="inline-flex items-center justify-center w-8 h-8 rounded-full text-[var(--er-text-subtle)] hover:text-[var(--er-text-primary)] hover:bg-white/10 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               aria-controls="mobile-menu"
-              aria-expanded="false"
+              aria-expanded={isOpen}
             >
               <span className="sr-only">Open main menu</span>
-              <div className={`relative w-6 h-6`}>
+              <div className={`relative w-5 h-5`}>
                 <div
-                  className={`absolute top-1 left-0 w-full h-0.5 bg-white transition-all duration-300 ${isOpen ? 'top-1/2 rotate-45 transform -translate-y-1/2' : ''
+                  className={`absolute top-1 left-0 w-full h-0.5 rounded bg-current transition-all duration-300 ${isOpen ? 'top-1/2 rotate-45 transform -translate-y-1/2' : ''
                     }`}
                 ></div>
                 <div
-                  className={`absolute top-1/2 left-0 transform -translate-y-1/2 w-full h-0.5 bg-white transition-all duration-300 ${isOpen ? 'opacity-0' : ''
+                  className={`absolute top-1/2 left-0 transform -translate-y-1/2 w-full h-0.5 rounded bg-current transition-all duration-300 ${isOpen ? 'opacity-0' : ''
                     }`}
                 ></div>
                 <div
-                  className={`absolute bottom-1 left-0 w-full h-0.5 bg-white transition-all duration-300 ${isOpen ? 'bottom-1/2 -rotate-45 transform translate-y-1/2' : ''
+                  className={`absolute bottom-1 left-0 w-full h-0.5 rounded bg-current transition-all duration-300 ${isOpen ? 'bottom-1/2 -rotate-45 transform translate-y-1/2' : ''
                     }`}
                 ></div>
               </div>
@@ -98,25 +112,28 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
           </div>
         </div>
       </div>
-      <div className="-mr-2 flex md:hidden overflow-hidden">
+      <div className="flex lg:hidden overflow-hidden">
         <CSSTransition
           in={isOpen}
           timeout={500}
           classNames="menu-transition"
           unmountOnExit
         >
-          <div className="md:hidden min-w-full bg-slate-800 border-t border-slate-700" id="mobile-menu">
-            <div className="rounded-lg px-2 pt-2 pb-3 space-y-1 pr-4 min-w-full">
+          <div className="lg:hidden w-full border-t border-white/10" id="mobile-menu">
+            <div className="px-2 pt-2 pb-3 space-y-1">
               {props.items.map((item) => (
                 <button
-                  key={item.path}
-                  className={`${activeItem === item.path && !item.url
-                      ? 'bg-slate-700 text-slate-300 font-bold'
-                      : 'text-gray-300 hover:bg-slate-700 hover:text-slate-200'
-                    } block rounded-lg px-3 py-2 text-base font-medium min-w-full text-left pl-3 transition-colors duration-200`}
-                  onClick={() => { selectTab(item) }}
+                  key={item.label}
+                  className={classNames(
+                    'flex items-center gap-1.5 w-full rounded-lg px-3 py-2 text-sm text-left transition-colors duration-150',
+                    isActive(item)
+                      ? 'bg-[color-mix(in_srgb,var(--er-surface-light)_20%,transparent)] text-[var(--er-interactive-text-light)] font-medium'
+                      : 'text-[var(--er-text-secondary)] hover:bg-white/5'
+                  )}
+                  onClick={() => { selectTab(item); setIsOpen(false); }}
                 >
                   {item.label}
+                  {item.url && <ExternalIcon />}
                 </button>
               ))}
             </div>

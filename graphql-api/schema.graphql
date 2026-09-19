@@ -72,6 +72,18 @@ type ZeroPoints {
     songs: [Song!]! @relationship(type: "RECEIVED", direction: IN)
 }
 
+# One country's points to another in one round of one contest. Read from the
+# GAVE_POINTS relationships by a custom resolver in index.js, so no generated
+# operations are needed.
+type Vote @exclude {
+    year: Int!
+    round: String!
+    voteType: String!
+    fromCountry: String!
+    toCountry: String!
+    points: Int!
+}
+
 type Query {
     years: [Year!]!
     countries: [Country!]!
@@ -84,4 +96,5 @@ type Query {
     finalPlaces: [FinalPlace!]!
     finalRunningOrders: [FinalRunningOrder!]!
     zeroPointsSongs: [Song!]!
+    votes: [Vote!]!
 }

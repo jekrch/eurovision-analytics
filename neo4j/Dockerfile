@@ -19,9 +19,19 @@ COPY ./migrations /migrations
 CMD ["sh", "-c", "neo4j start; \
     echo 'Waiting for Neo4j to be available...'; \
     until wget -q --spider http://localhost:7474; do sleep 5; done; \
-    echo 'Neo4j is available, waiting for 5 seconds before running migrations...'; \
-    sleep 5; \
+    echo 'Neo4j is available, waiting for Bolt...'; \
+    tries=0; \
+    until cypher-shell --non-interactive 'RETURN 1' >/dev/null 2>&1; do \
+      tries=$((tries+1)); \
+      if [ $tries -ge 30 ]; then echo 'Bolt never became available; check /logs/debug.log (out of memory?)'; exit 1; fi; \
+      sleep 5; \
+    done; \
     echo 'Running migrations...'; \
-    cypher-shell --non-interactive --format plain --file /migrations/V1__import_data.cypher; \
-    echo 'Migration completed successfully.'; \
+    for f in /migrations/*.cypher; do \
+      echo \"Running $f...\"; \
+      if ! cypher-shell --non-interactive --format plain --file $f; then \
+        echo \"Migration FAILED: $f\"; exit 1; \
+      fi; \
+    done; \
+    echo 'Migrations completed successfully.'; \
     tail -f /dev/null;"]

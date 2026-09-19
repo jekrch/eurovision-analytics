@@ -64,6 +64,20 @@ services:
       - "3000:3000"
     depends_on:
       - graphql-api
+    develop:
+      watch:
+        # copy source edits into the running container; webpack-dev-server picks them up
+        - action: sync
+          path: ./frontend
+          target: /app
+          ignore:
+            - node_modules/
+            - dist/
+        # dependency changes need a fresh npm install, so rebuild the image
+        - action: rebuild
+          path: ./frontend/package.json
+        - action: rebuild
+          path: ./frontend/package-lock.json
 
 volumes:
   data:
