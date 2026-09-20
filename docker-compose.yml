@@ -7,7 +7,7 @@ services:
       POSTGRES_DB: eurovision
     volumes:
       - ./data:/data
-      - ./flyway/sql:/flyway/sql
+      - pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
@@ -33,6 +33,9 @@ services:
     ports:
       - "7474:7474"
       - "7687:7687"
+    volumes:
+      - neo4jdata:/data
+      - neo4jlogs:/logs
     depends_on:
       db:
         condition: service_healthy
@@ -78,4 +81,6 @@ services:
           path: ./frontend/package-lock.json
 
 volumes:
-  data:
+  pgdata:
+  neo4jdata:
+  neo4jlogs:
