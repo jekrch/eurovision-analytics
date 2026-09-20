@@ -25,6 +25,9 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
 
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  // react-transition-group reaches for ReactDOM.findDOMNode without a nodeRef,
+  // and that was removed in React 19
+  const panelRef = useRef<HTMLDivElement>(null);
 
   function selectTab(navItem: NavItem) {
     if (navItem.url) {
@@ -115,11 +118,12 @@ const Navbar: React.FC<NavbarProps> = (props: NavbarProps) => {
       <div className="flex lg:hidden overflow-hidden">
         <CSSTransition
           in={isOpen}
+          nodeRef={panelRef}
           timeout={500}
           classNames="menu-transition"
           unmountOnExit
         >
-          <div className="lg:hidden w-full border-t border-white/10" id="mobile-menu">
+          <div ref={panelRef} className="lg:hidden w-full border-t border-white/10" id="mobile-menu">
             <div className="px-2 pt-2 pb-3 space-y-1">
               {props.items.map((item) => (
                 <button

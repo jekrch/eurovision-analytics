@@ -31,15 +31,15 @@ const PlaceChart: React.FC = () => {
                         query {
                             countries(where: {
                                 songs: {
-                                    finalPlace: {
-                                        place_GT: 0
+                                    some: {
+                                        finalPlace: {
+                                            place: { gt: 0 }
+                                        }
                                     }
                                 }
-                            }, options: {
-                                sort: [{
-                                    name: ASC
-                                }]
-                            }) {
+                            }, sort: [{
+                                name: ASC
+                            }]) {
                                 name
                             }
                         }
@@ -62,7 +62,7 @@ const PlaceChart: React.FC = () => {
                 body: JSON.stringify({
                     query: `
                         query {
-                            songs(where: { country: { name: "${selectedCountry}" }, finalPlace: { place_NOT: null } }) {
+                            songs(where: { country: { name: { eq: "${selectedCountry}" } }, finalPlace: { place: { gt: 0 } } }) {
                                 id
                                     name
                                     youtubeUrl

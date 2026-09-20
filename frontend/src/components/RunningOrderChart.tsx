@@ -33,7 +33,7 @@ const RunningOrderChart: React.FC = () => {
                 body: JSON.stringify({
                     query: `
                         query {
-                            finalRunningOrders(options: { sort: [{ order: ASC }] }) {
+                            finalRunningOrders(sort: [{ order: ASC }]) {
                                 order
                                 songs {
                                     finalPlace {

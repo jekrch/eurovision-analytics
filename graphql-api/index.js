@@ -1,4 +1,5 @@
-const { ApolloServer } = require('apollo-server');
+const { ApolloServer } = require('@apollo/server');
+const { startStandaloneServer } = require('@apollo/server/standalone');
 const { Neo4jGraphQL } = require('@neo4j/graphql');
 const neo4j = require('neo4j-driver');
 const fs = require('fs');
@@ -37,11 +38,17 @@ const resolvers = {
 
 const neoSchema = new Neo4jGraphQL({ typeDefs, resolvers, driver });
 
-const server = new ApolloServer({
-  schema: neoSchema.schema,
-  context: { driver },
-});
+async function main() {
+  // the schema is built asynchronously since @neo4j/graphql v3
+  const schema = await neoSchema.getSchema();
+  const server = new ApolloServer({ schema });
 
-server.listen().then(({ url }) => {
+  const { url } = await startStandaloneServer(server, { listen: { port: 4000 } });
   console.log(`🚀 GraphQL API ready at ${url}`);
+}
+
+main().catch(async (error) => {
+  console.error(error);
+  await driver.close();
+  process.exit(1);
 });

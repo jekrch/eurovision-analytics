@@ -1,32 +1,32 @@
-type Year {
+type Year @node {
     year: Int!
     songs: [Song!]! @relationship(type: "HAS_SONG", direction: OUT)
 }
 
-type Country {
+type Country @node {
     name: String!
     songs: [Song!]! @relationship(type: "REPRESENTS", direction: IN)
 }
 
-type Broadcaster {
+type Broadcaster @node {
     name: String!
     songs: [Song!]! @relationship(type: "BROADCAST_BY", direction: IN)
 }
 
-type Artist {
+type Artist @node {
     id: ID!
     name: String!
     wikiUrl: String
     songs: [Song!]! @relationship(type: "PERFORMED_BY", direction: IN)
 }
 
-type Song {
+type Song @node {
     id: ID!
     name: String!
-    year: Year! @relationship(type: "HAS_SONG", direction: IN)
-    artist: Artist! @relationship(type: "PERFORMED_BY", direction: OUT)
-    country: Country! @relationship(type: "REPRESENTS", direction: OUT)
-    broadcaster: Broadcaster! @relationship(type: "BROADCAST_BY", direction: OUT)
+    year: Year @relationship(type: "HAS_SONG", direction: IN)
+    artist: Artist @relationship(type: "PERFORMED_BY", direction: OUT)
+    country: Country @relationship(type: "REPRESENTS", direction: OUT)
+    broadcaster: Broadcaster @relationship(type: "BROADCAST_BY", direction: OUT)
     languages: [Language!]! @relationship(type: "IN_LANGUAGE", direction: OUT)
     songwriters: [Songwriter!]! @relationship(type: "WRITTEN_BY", direction: OUT)
     conductor: Conductor @relationship(type: "CONDUCTED_BY", direction: OUT)
@@ -39,35 +39,35 @@ type Song {
     zeroPoints: ZeroPoints @relationship(type: "RECEIVED", direction: OUT)
 }
 
-type Language {
+type Language @node {
     name: String!
     songs: [Song!]! @relationship(type: "IN_LANGUAGE", direction: IN)
 }
 
-type Songwriter {
+type Songwriter @node {
     name: String!
     songs: [Song!]! @relationship(type: "WRITTEN_BY", direction: IN)
 }
 
-type Conductor {
+type Conductor @node {
     id: ID!
     name: String!
     songs: [Song!]! @relationship(type: "CONDUCTED_BY", direction: IN)
 }
 
-type FinalPlace {
+type FinalPlace @node {
     place: Int!
     name: String!
     songs: [Song!]! @relationship(type: "PLACED", direction: IN)
 }
 
-type FinalRunningOrder {
+type FinalRunningOrder @node {
     order: Int!
     name: String!
     songs: [Song!]! @relationship(type: "RUNNING_ORDER", direction: IN)
 }
 
-type ZeroPoints {
+type ZeroPoints @node {
     name: String!
     songs: [Song!]! @relationship(type: "RECEIVED", direction: IN)
 }
@@ -75,7 +75,7 @@ type ZeroPoints {
 # One country's points to another in one round of one contest. Read from the
 # GAVE_POINTS relationships by a custom resolver in index.js, so no generated
 # operations are needed.
-type Vote @exclude {
+type Vote {
     year: Int!
     round: String!
     voteType: String!
@@ -85,16 +85,5 @@ type Vote @exclude {
 }
 
 type Query {
-    years: [Year!]!
-    countries: [Country!]!
-    broadcasters: [Broadcaster!]!
-    artists: [Artist!]!
-    songs: [Song!]!
-    languages: [Language!]!
-    songwriters: [Songwriter!]!
-    conductors: [Conductor!]!
-    finalPlaces: [FinalPlace!]!
-    finalRunningOrders: [FinalRunningOrder!]!
-    zeroPointsSongs: [Song!]!
     votes: [Vote!]!
 }
