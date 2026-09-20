@@ -1,3 +1,4 @@
+import { Chart } from "chart.js";
 import { Song } from "../models/Song";
 
 interface Tooltip {

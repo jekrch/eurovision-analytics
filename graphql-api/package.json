@@ -1,15 +1,18 @@
 {
-    "name": "graphql-api",
-    "version": "1.0.0",
-    "description": "GraphQL API for Neo4j",
-    "main": "index.js",
-    "scripts": {
-      "start": "node index.js"
-    },
-    "dependencies": {
-      "@neo4j/graphql": "^2.0.0",
-      "apollo-server": "^3.0.0",
-      "graphql": "^15.5.0",
-      "neo4j-driver": "^4.2.0"
-    }
+  "name": "graphql-api",
+  "version": "1.0.0",
+  "description": "GraphQL API for Neo4j",
+  "main": "index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@apollo/server": "^5.5.1",
+    "@neo4j/graphql": "^7.6.3",
+    "graphql": "^16.14.2",
+    "neo4j-driver": "^6.2.0"
   }
+}
