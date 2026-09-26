@@ -1,0 +1,175 @@
+apiVersion: v1
+data:
+  R__views.sql: "-- a view that aggregates/denormalizes song data\nCREATE OR REPLACE
+    VIEW song_view AS\nSELECT\n  s.year,\n  c.name AS country,\n  s.broadcaster,\n
+    \ a.name AS artist,\n  s.name AS song,\n  s.language,\n  STRING_AGG(cp.name, ','
+    ORDER BY cp.name) FILTER (WHERE TRIM(cp.name, chr(160)) <> '') AS songwriters,\n
+    \ cd.name AS conductor,\n  s.youtube_url,\n  s.wiki_url AS song_wiki_url,\n  a.wiki_url
+    AS artist_wiki_url,\n  a.id AS artist_id, \n  s.id AS song_id,\n  cd.id AS conductor_id,\n
+    \ c.id AS country_id\nFROM song s\nJOIN artist a ON s.artist_id = a.id\nJOIN country
+    c ON s.country_id = c.id\nLEFT JOIN song_composer sc ON s.id = sc.song_id\nLEFT
+    JOIN composer cp ON sc.composer_id = cp.id\nLEFT JOIN song_conductor scd ON s.id
+    = scd.song_id\nLEFT JOIN conductor cd ON scd.conductor_id = cd.id\nGROUP BY\n
+    \ s.year,\n  c.name,\n  s.broadcaster,\n  a.name,\n  a.wiki_url,\n  s.name,\n
+    \ s.wiki_url,\n  s.language,\n  cd.name,\n  a.id, \n  s.id,\n  cd.id,\n  c.id;\n\n\n--
+    this aggregates voting data between countries for different years and rounds voting
+    types \nCREATE OR REPLACE VIEW vote_view AS\nSELECT\n  v.id AS vote_id,\n  v.year,\n
+    \ r.name AS round,\n  vt.name AS vote_type,\n  v.points,\n  vc.name AS voting_country,\n
+    \ c.name AS country,\n  vc.code AS voting_country_code,\n  c.code AS country_code,
+    \n  vc.id AS voting_country_id,\n  c.id AS country_id\nFROM vote v\nJOIN round
+    r ON v.round_id = r.id\nJOIN vote_type vt ON v.vote_type_id = vt.id\nJOIN country
+    vc ON v.voting_country_id = vc.id\nJOIN country c ON v.country_id = c.id;\n\n\n--
+    this represents the rank and total points of each country for each contest round
+    per year\n\n -- this represents the rank and total points of each country for
+    each contest round per year\n\nCREATE OR REPLACE VIEW vote_rank_view AS \nSELECT\n
+    \ fr.year, \n  fr.country_id, \n  sv.country, \n  'Final' AS round, \n  sv.artist_id,\n
+    \ sv.artist, \n  sv.song_id, \n  sv.song,\n  coalesce(SUM(vv.points), 0) AS total_points,\n
+    \ fr.place AS final_place,\n  fr.running_order AS final_running_order\nFROM song_view
+    sv\nLEFT JOIN vote_view vv ON sv.country_id = vv.country_id AND \n                     \t
+    \   sv.year = vv.year AND \n\t\t\t\t\t\t              vv.round = 'Final'\nJOIN
+    finals_result fr ON fr.song_id = sv.song_id \nGROUP BY \n  fr.year, \n  fr.country_id,
+    \n  sv.country, \n  sv.artist_id,\n  sv.artist, \n  sv.song_id, \n  sv.song,\n
+    \ fr.place,\n  fr.running_order;"
+  V1__create_staging_tables.sql: "CREATE TABLE staging_vote_data (\n  year INTEGER,\n
+    \ round TEXT,\n  country TEXT,\n  voting_country TEXT,\n  vote_type TEXT,\n  points
+    INTEGER\n);\n\nCREATE TABLE staging_participant_data (\n  year INTEGER,\n  country
+    TEXT,\n  broadcaster TEXT,\n  artist TEXT,\n  artist_wiki_url TEXT,\n  song TEXT,\n
+    \ song_wiki_url TEXT,\n  language TEXT,\n  songwriters TEXT,\n  conductors TEXT,\n
+    \ youtube_url TEXT\n);\n\nCREATE TABLE staging_result_data (\n  year INTEGER,\n
+    \ country TEXT,\n  running_order INTEGER,\n  place TEXT\n);\n\n-- copy csv data
+    directly to staging tables \nCOPY staging_vote_data FROM '/data/eurovision_vote_data.csv'
+    DELIMITER ',' CSV HEADER;\nCOPY staging_participant_data FROM '/data/eurovision_participant_data.csv'
+    DELIMITER ',' CSV HEADER;\nCOPY staging_result_data FROM '/data/eurovision_result_data.csv'
+    DELIMITER ',' CSV HEADER;\n\n-- ========= 3. CLEAN AND TRANSFORM DATA =========\n--
+    Clean the 'songwriters' column in the staging_participant_data table.\n\n-- Step
+    3.1: Remove all bracketed text (e.g., '[|sv|]', '[, c, ]', etc.)\n-- We use a
+    regular expression to find and replace any text enclosed in square brackets.\nUPDATE
+    staging_participant_data\nSET songwriters = regexp_replace(songwriters, '\\[.*?\\]',
+    '', 'g');\n\n-- Step 3.2: Standardize delimiters to a single pipe '|'.\n-- This
+    replaces any commas with pipes to ensure consistency.\nUPDATE staging_participant_data\nSET
+    songwriters = regexp_replace(songwriters, '\\s*,\\s*', '|', 'g');\n\n-- Step 3.3:
+    Collapse multiple or spaced-out pipes into a single pipe.\n-- This cleans up messes
+    like ' | ' or '||' that can result from the previous step.\nUPDATE staging_participant_data\nSET
+    songwriters = regexp_replace(songwriters, '\\s*\\|\\s*', '|', 'g');\nUPDATE staging_participant_data\nSET
+    songwriters = regexp_replace(songwriters, '\\|{2,}', '|', 'g');\n\n-- Step 3.4:
+    Remove any leading or trailing pipe delimiters from the cleaned string.\nUPDATE
+    staging_participant_data\nSET songwriters = trim(both '|' from songwriters);"
+  V2__create_country_table.sql: "CREATE TABLE country (\n  id BIGSERIAL PRIMARY KEY,\n
+    \ name TEXT NOT NULL,\n  code TEXT NOT NULL\n);\n\nCREATE UNIQUE INDEX IF NOT
+    EXISTS country_name_uidx ON country(name);\nCREATE UNIQUE INDEX IF NOT EXISTS
+    country_code_uidx ON country(code);\n\nINSERT INTO country (name, code) VALUES\n
+    \ ('Albania', 'al'),\n  ('Andorra', 'ad'),\n  ('Armenia', 'am'),\n  ('Australia',
+    'au'),\n  ('Austria', 'at'),\n  ('Azerbaijan', 'az'),\n  ('Belarus', 'by'),\n
+    \ ('Belgium', 'be'),\n  ('Bulgaria', 'bg'),\n  ('Bosnia and Herzegovina', 'ba'),\n
+    \ ('Croatia', 'hr'),\n  ('Cyprus', 'cy'),\n  ('Czechia', 'cz'),\n  ('Denmark',
+    'dk'),\n  ('Estonia', 'ee'),\n  ('Finland', 'fi'),\n  ('France', 'fr'),\n  ('Georgia',
+    'ge'),\n  ('Germany', 'de'),\n  ('Greece', 'gr'),\n  ('Hungary', 'hu'),\n  ('Iceland',
+    'is'),\n  ('Ireland', 'ie'),\n  ('Israel', 'il'),\n  ('Italy', 'it'),\n  ('Latvia',
+    'lv'),\n  ('Lithuania', 'lt'),\n  ('Luxembourg', 'lu'),\n  ('Malta', 'mt'),\n
+    \ ('Moldova', 'md'),\n  ('Montenegro', 'me'),\n  ('Monaco', 'mc'),\n  ('Morocco',
+    'ma'),\n  ('Netherlands', 'nl'),\n  ('Norway', 'no'),\n  ('Macedonia', 'mk'),\n
+    \ ('Poland', 'pl'),\n  ('Portugal', 'pt'),\n  ('Romania', 'ro'),\n  ('Russia',
+    'ru'),\n  ('San Marino', 'sm'),\n  ('Serbia', 'rs'),\n  ('Serbia and Montenegro',
+    'cs'),\n  ('Slovenia', 'si'),\n  ('Slovakia', 'sk'),\n  ('Spain', 'es'),\n  ('Sweden',
+    'se'),\n  ('Switzerland', 'ch'),\n  ('Turkey', 'tr'),\n  ('Ukraine', 'ua'),\n
+    \ ('United Kingdom', 'gb'),\n  ('Yugoslavia', 'yu'),\n  -- note that this is a
+    psuedo country that is included as a voting source \n  -- since the 2023 contest\n
+    \ ('Rest of World', 'row'); "
+  V3__participant_schema.sql: "-- tables \n\n-- taken from staging_participant_data.artist\nCREATE
+    TABLE IF NOT EXISTS artist (\n  id BIGSERIAL PRIMARY KEY,\n  name TEXT NOT NULL,
+    \n  wiki_url TEXT\n); \n\n-- taken from the | separated values in staging_participant_data.songwriters\nCREATE
+    TABLE IF NOT EXISTS composer (\n  id BIGSERIAL PRIMARY KEY,\n  name TEXT NOT NULL\n);
+    \n\n-- from staging_participant_data.conductors\nCREATE TABLE IF NOT EXISTS conductor
+    (\n  id BIGSERIAL PRIMARY KEY,\n  name TEXT NOT NULL\n); \n\n-- from staging_participant_data.song,
+    song_wikiurl, language, year, country (by fk), artist (by fk)\nCREATE TABLE IF
+    NOT EXISTS song (\n  id BIGSERIAL PRIMARY KEY,\n  name TEXT NOT NULL,\n  language
+    TEXT,\n  broadcaster TEXT,\n  wiki_url TEXT,\n  artist_id BIGINT REFERENCES artist,\n
+    \ country_id BIGINT REFERENCES country,\n  year BIGINT,\n  youtube_url TEXT\n);
+    \n\n-- join tables \n\nCREATE TABLE IF NOT EXISTS song_composer (\n  id BIGSERIAL
+    PRIMARY KEY,\n  song_id BIGINT REFERENCES song,\n  composer_id BIGINT REFERENCES
+    composer\n); \n\nCREATE TABLE IF NOT EXISTS song_conductor (\n  id BIGSERIAL primary
+    key,\n  song_id BIGINT references song,\n  conductor_id BIGINT references conductor\n);
+    \n\n\n-- indexes\n\n-- country table\nCREATE UNIQUE INDEX IF NOT EXISTS country_code_uidx
+    ON country (code);\n\n-- artist table\nCREATE UNIQUE INDEX artist_name_uidx ON
+    artist (name);\n\n-- composer table\nCREATE UNIQUE INDEX composer_name_uidx ON
+    composer (name);\n\n-- conductor table\nCREATE UNIQUE INDEX conductor_name_uidx
+    ON conductor (name);\n\n-- song table\nCREATE INDEX IF NOT EXISTS song_artist_id_idx
+    ON song (artist_id);\nCREATE INDEX IF NOT EXISTS song_country_id_idx ON song (country_id);\nCREATE
+    INDEX IF NOT EXISTS song_year_idx ON song (year);\n\n-- song_composer table\nCREATE
+    INDEX IF NOT EXISTS song_composer_song_id_idx ON song_composer (song_id);\nCREATE
+    INDEX IF NOT EXISTS song_composer_composer_id_idx ON song_composer (composer_id);\n\n--
+    song_conductor table\nCREATE INDEX IF NOT EXISTS song_conductor_song_id_idx ON
+    song_conductor (song_id);\nCREATE INDEX IF NOT EXISTS song_conductor_conductor_id_idx
+    ON song_conductor (conductor_id);"
+  V4__migrate_participant_data.sql: "-- artists\nINSERT INTO artist (name, wiki_url)\nSELECT
+    DISTINCT artist, artist_wiki_url\nFROM staging_participant_data\nON CONFLICT (name)
+    DO NOTHING;\n\n-- composers\nINSERT INTO composer (name)\nSELECT DISTINCT unnest(string_to_array(songwriters,
+    '|')) AS name\nFROM staging_participant_data\nWHERE songwriters IS NOT NULL\nON
+    CONFLICT (name) DO NOTHING;\n\n-- conductors\nINSERT INTO conductor (name)\nSELECT
+    DISTINCT conductors\nFROM staging_participant_data\nWHERE conductors IS NOT NULL\nON
+    CONFLICT (name) DO NOTHING;\n\n-- songs\nINSERT INTO song (name, language, broadcaster,
+    wiki_url, artist_id, country_id, year, youtube_url)\nSELECT DISTINCT ON (spd.song,
+    spd.year)\n    spd.song,\n    TRIM(REGEXP_REPLACE(spd.language, '[^a-zA-Z,]',
+    '', 'g')) AS language,\n    spd.broadcaster,\n    spd.song_wiki_url,\n    a.id
+    AS artist_id,\n    c.id AS country_id,\n    spd.year, \n    spd.youtube_url\nFROM
+    staging_participant_data spd\nJOIN artist a ON spd.artist = a.name\nJOIN country
+    c ON spd.country = c.code\nORDER BY spd.year, spd.song, c.id ASC;\n\n-- song-composer
+    relationships\nINSERT INTO song_composer (song_id, composer_id)\nSELECT DISTINCT\n
+    \ s.id AS song_id,\n  cp.id AS composer_id\nFROM staging_participant_data spd\nJOIN
+    song s ON spd.song = s.name AND spd.year = s.year\nJOIN composer cp ON cp.name
+    = ANY(string_to_array(spd.songwriters, '|'))\nWHERE spd.songwriters IS NOT NULL;\n\n--
+    song-conductor relationships\nINSERT INTO song_conductor (song_id, conductor_id)\nSELECT
+    DISTINCT\n  s.id AS song_id,\n  cd.id AS conductor_id\nFROM staging_participant_data
+    spd\nJOIN song s ON spd.song = s.name AND spd.year = s.year\nJOIN conductor cd
+    ON spd.conductors = cd.name\nWHERE spd.conductors IS NOT NULL;"
+  V5__vote_schema.sql: "CREATE TABLE IF NOT EXISTS round (\n  id BIGSERIAL PRIMARY
+    KEY,\n  code TEXT,\n  final boolean DEFAULT false,\n  name TEXT \n);\n\nCREATE
+    UNIQUE INDEX IF NOT EXISTS round_name_uidx ON round(name);\n\n-- staging_vote_data.round\nINSERT
+    INTO round(name, code, final)\nVALUES \t\t\t\t\t\t\t\n\t('Final', \t\t\t'f',   true),
+    \t\n\t('Semi-Final', \t\t'sf',  false), \n\t('Semi-Final 1', \t'sf1', false),
+    \n\t('Semi-Final 2', \t'sf2', false)  \t\nON CONFLICT DO NOTHING;\n\n\nCREATE
+    TABLE IF NOT EXISTS vote_type (\n  id BIGSERIAL PRIMARY KEY,\n  code TEXT,\n  name
+    TEXT \n);\n\nCREATE UNIQUE INDEX IF NOT EXISTS vote_type_name_uidx ON vote_type(name);\n\n--
+    from from staging_vote_data.vote_type\nINSERT INTO vote_type(name, code)\nVALUES
+    \t\t\t\t\n\t('Total', 't'), \n\t('Jury', 'j'), \t    \n\t('Televote', 'tv')  \nON
+    CONFLICT DO NOTHING;\n\nCREATE TABLE IF NOT EXISTS vote (\n  id BIGSERIAL PRIMARY
+    KEY,\n  year INTEGER,\t\t\t\t\t\t\t\t                  -- staging_vote_data.year\n
+    \ round_id BIGINT REFERENCES round,\t\t\t        -- staging_vote_data.round\n
+    \ vote_type_id BIGINT REFERENCES vote_type,     -- staging_vote_data.vote_type\n
+    \ voting_country_id BIGINT REFERENCES country,  -- staging_vote_data.voting_country
+    (country.code)\n  country_id BIGINT REFERENCES country,\t\t      -- staging_vote_data.country
+    (country.code)\n  points INTEGER\t\t\t\t\t\t\t                  -- staging_vote_data.points\n);\n\nCREATE
+    INDEX IF NOT EXISTS vote_year_idx ON vote(year);\nCREATE INDEX IF NOT EXISTS vote_round_id_idx
+    ON vote(round_id);\nCREATE INDEX IF NOT EXISTS vote_vote_type_id_idx ON vote(vote_type_id);\nCREATE
+    INDEX IF NOT EXISTS vote_voting_country_id_idx ON vote(voting_country_id);\nCREATE
+    INDEX IF NOT EXISTS vote_country_id_idx ON vote(country_id);\n\n"
+  V6__migrate_vote_data.sql: "-- migrate all vote data from the staging table\nDO
+    $$ BEGIN \n\n  IF NOT EXISTS (SELECT * FROM vote) THEN \n\n    INSERT INTO vote
+    (\n      year, \n      round_id, \n      vote_type_id, \n      voting_country_id,
+    \n      country_id, \n      points\n    )\n    SELECT\n      svd.year,\n      r.id
+    AS round_id,\n      vt.id AS vote_type_id,\n      vc.id AS voting_country_id,\n
+    \     c.id AS country_id,\n      svd.points\n    FROM staging_vote_data svd\n
+    \   LEFT JOIN round r ON r.code = svd.round \n    LEFT JOIN vote_type vt ON vt.code
+    = svd.vote_type \n    LEFT JOIN country c ON c.code = svd.country \n    LEFT JOIN
+    country vc ON vc.code = svd.voting_country;\n  \n  END IF;\nEND\n$$;"
+  V7__finals_result_schema.sql: "CREATE TABLE IF NOT EXISTS finals_result (\n  id
+    BIGSERIAL PRIMARY KEY,\n  year INTEGER,\n  song_id BIGINT REFERENCES song,\n  country_id
+    BIGINT REFERENCES country,\n  running_order INTEGER, \n  place INTEGER\n);\n\nCREATE
+    INDEX IF NOT EXISTS finals_result_year ON finals_result(year);\nCREATE INDEX IF
+    NOT EXISTS finals_result_song_id ON finals_result(song_id);\nCREATE INDEX IF NOT
+    EXISTS finals_result_country_id ON finals_result(country_id);\nCREATE INDEX IF
+    NOT EXISTS finals_result_running_order ON finals_result(running_order);\nCREATE
+    INDEX IF NOT EXISTS finals_result_place ON finals_result(place);\n"
+  V8__migrate_finals_data.sql: "/* Migrate the finals result data to the finals_result
+    table */\nDO $$\nBEGIN\n    IF NOT EXISTS (SELECT * FROM finals_result) THEN\n
+    \       INSERT INTO finals_result (year, song_id, country_id, running_order, place)\n
+    \       SELECT srd.year, s.id, c.id, srd.running_order, \n            CASE\n                WHEN
+    srd.place ~ '^\\d+$' THEN CAST(srd.place AS INTEGER)\n                ELSE NULL\n
+    \           END AS place\n        FROM staging_result_data srd\n        LEFT JOIN
+    country c ON c.name = CASE\n            WHEN srd.country = 'Czech Republic' THEN
+    'Czechia'\n            WHEN srd.country = 'North Macedonia' THEN 'Macedonia'\n
+    \           ELSE srd.country\n        END\n        LEFT JOIN song s ON s.country_id
+    = c.id AND s.year = srd.year;\n    END IF;\nEND $$;"
+kind: ConfigMap
+metadata:
+  name: flyway-sql

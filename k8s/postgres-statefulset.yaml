@@ -16,6 +16,17 @@ spec:
       containers:
       - name: db
         image: eurovision-db:dev
+        readinessProbe:
+          exec:
+            command: 
+            - pg_isready
+            - -U
+            - postgres
+            - -d
+            - eurovision
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 5
         ports: 
         - containerPort: 5432
           protocol: TCP
