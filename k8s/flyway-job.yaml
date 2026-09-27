@@ -1,0 +1,45 @@
+apiVersion: batch/v1 
+kind: Job
+metadata:
+  name: flyway 
+spec:
+  template: 
+    metadata:
+      name: flyway
+      labels: 
+        app: flyway
+    spec:
+      containers:
+      - name: flyway
+        image: flyway/flyway:13
+        args: 
+        - -url=jdbc:postgresql://db:5432/eurovision 
+        - -user=postgres 
+        - -password=$(pw)
+        - -locations=filesystem:/flyway/sql 
+        - migrate
+        env:
+        - name: pw 
+          valueFrom:
+            secretKeyRef:
+              name: postgres-creds
+              key: POSTGRES_PASSWORD
+        volumeMounts: 
+        - name: flyway-sql
+          mountPath: /flyway/sql
+      restartPolicy: Never
+      volumes:
+      - name: flyway-sql
+        configMap:
+          name: flyway-sql
+      initContainers: 
+      # wait for the db to be ready before executing flyway
+      - name: db-probe
+        image: eurovision-db:dev
+        command: 
+        - sh 
+        - -c
+        - "until pg_isready -h db; do sleep 3; done"
+
+
+        

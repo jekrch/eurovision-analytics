@@ -1,5 +1,6 @@
 apiVersion: v1
-data:
+data: 
+  # I'm going to bake flyway into and image later, this is just for learning purposes 
   R__views.sql: "-- a view that aggregates/denormalizes song data\nCREATE OR REPLACE
     VIEW song_view AS\nSELECT\n  s.year,\n  c.name AS country,\n  s.broadcaster,\n
     \ a.name AS artist,\n  s.name AS song,\n  s.language,\n  STRING_AGG(cp.name, ','
