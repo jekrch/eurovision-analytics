@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: StatefulSet 
+metadata:
+  name: neo4j
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: neo4j 
+  template: 
+    metadata:
+      name: neo4j
+      labels: 
+        app: neo4j
+    spec:
+      containers:
+      - name: neo4j
+        image: eurovision-neo4j:dev
+        readinessProbe: 
+          httpGet:
+            path: /
+            port: 7474
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 5
+        ports: 
+        - containerPort: 7474
+          protocol: TCP
+        - containerPort: 7687
+          protocol: TCP
+        volumeMounts:
+        - name: neo4jdata
+          mountPath: /data
+      # don't create env vars with NEO4J_ prefixes
+      # since neo4j will attempt to use them and fail 
+      enableServiceLinks: false 
+  volumeClaimTemplates:
+  - apiVersion: v1 
+    kind: PersistentVolumeClaim
+    metadata:
+      name: neo4jdata 
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi

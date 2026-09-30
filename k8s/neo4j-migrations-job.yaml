@@ -1,0 +1,45 @@
+apiVersion: batch/v1 
+kind: Job
+metadata:
+  name: neo4j-migrations 
+spec:
+  template: 
+    metadata:
+      name: neo4j-migrations 
+      labels: 
+        app: neo4j-migrations 
+    spec:
+      containers:
+      - name: neo4j-migrations 
+        image: eurovision-neo4j-migrations:dev
+        command: 
+        - sh
+        - -c
+        - |
+          for f in $(ls /migrations/*.cypher | sort -V); do 
+          echo "Running $f..."; 
+          if ! cypher-shell -a neo4j://neo4j:7687 --non-interactive --format plain --file $f; then 
+          echo "Migration FAILED : $f"; exit 1; 
+          fi;
+          done;
+      restartPolicy: Never
+      initContainers: 
+      # wait for the db to be ready before executing migrations
+      - name: db-probe
+        image: eurovision-db:dev
+        command: 
+        - sh 
+        - -c
+        - "until pg_isready -h db; do sleep 3; done"
+      - name: neo4j-probe
+        image: eurovision-neo4j-migrations:dev
+        command: 
+        - sh 
+        - -c
+        - |
+          until cypher-shell -a neo4j://neo4j:7687 --non-interactive 'RETURN 1'; do 
+          tries=$((tries+1)); 
+          if [ $tries -ge 30 ]; then echo 'Bolt never became available; check /logs/debug.log (out of memory?)'; exit 1; fi; 
+          sleep 5; 
+          done; 
+        
